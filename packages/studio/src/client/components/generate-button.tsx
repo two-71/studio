@@ -26,11 +26,10 @@ export function GenerateButton({ className }: { className?: string }) {
   const generate = useGenerate();
   const { data } = useBalance();
 
-  const cost = selectedRunnableModels(config.models, selectedModelIds).reduce(
-    (sum, model) => sum + model.coinCost,
-    0
-  );
-  const canGenerate = hasPrompt && cost > 0 && !generating;
+  const models = selectedRunnableModels(config.models, selectedModelIds);
+  const cost = models.reduce((sum, model) => sum + model.coinCost, 0);
+  // Gate on selection, not cost — free-billing hosts have zero-cost models.
+  const canGenerate = hasPrompt && models.length > 0 && !generating;
 
   const handleGenerate = async () => {
     const balance = data?.balance;
@@ -46,7 +45,9 @@ export function GenerateButton({ className }: { className?: string }) {
     }
 
     toast.success(
-      `Generating · −${formatCoinName(config.coinName, { count: cost })}`
+      cost > 0
+        ? `Generating · −${formatCoinName(config.coinName, { count: cost })}`
+        : "Generating…"
     );
     await generate();
   };
