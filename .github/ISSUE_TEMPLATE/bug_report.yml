@@ -1,0 +1,62 @@
+name: Bug report
+description: Something in the package or demo app isn't working as expected.
+labels: [bug]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened
+      description: A clear description of the bug, and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps, ideally against `apps/demo`.
+      placeholder: |
+        1. ...
+        2. ...
+    validations:
+      required: true
+
+  - type: input
+    id: package-version
+    attributes:
+      label: "@two-71/studio version"
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: entry-point
+    attributes:
+      label: Affected entry point
+      multiple: true
+      options:
+        - "."
+        - "./server"
+        - "./client"
+        - "./tasks"
+        - "./schema"
+        - apps/demo
+        - not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: bun version, Next.js version, OS, deployment target (local/Vercel/other).
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      render: shell
+    validations:
+      required: false
