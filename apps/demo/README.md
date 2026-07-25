@@ -91,10 +91,10 @@ watermarked/republished the way this demo expects.
 - `app/api/auth/[...all]/route.ts` — better-auth's route handler.
 - `trigger/studio.ts` — re-exports `createStudioTasks(studioConfig)` so
   Trigger.dev's scanned `trigger/` dir picks up the five background tasks.
-- `app/studio/page.tsx` + `components/studio-content.tsx` — session guard,
-  `<Studio />` provider, and this app's own minimal generate form + gallery
-  (the package's `./client` entry ships providers only, not a prebuilt UI
-  tree, in this snapshot — see the client/server split note in
-  `studio-content.tsx`).
+- `app/studio/page.tsx` + `app/studio/studio-client.tsx` — session guard,
+  `deriveClientConfig`, and the `<Studio />` client wrapper. The package's
+  `./client` entry owns the full shell/gallery/controls tree, so this app
+  only supplies the `onSignOut`/`loginUrl` function props that can't cross
+  the server/client boundary (see `studio-client.tsx`).
 - `lib/db/schema.ts` — better-auth's tables + the package's `generation`
   table fragment (`createGenerationTable`).

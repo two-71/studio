@@ -1,24 +1,30 @@
 @import "tailwindcss";
 
-/* shadcn-style CSS variable tokens. The package ships no UI components in
-   this snapshot (its "./client" entry is providers only, spec §10 B1 note),
-   so this token set isn't consumed by @two-71/studio itself — it exists so
-   this app's own Studio UI (components/studio-content.tsx) and login form
-   have a small, consistent, theme-aware palette instead of one-off colors. */
+/* shadcn-style CSS variable tokens, theme-aware. Consumed both by this app's
+   own login form and by the package's moved <Studio /> component tree
+   (bg-sidebar/bg-popover/bg-accent/bg-secondary etc.), so this set covers
+   every token those components reference. */
 :root {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
   --card: 0 0% 100%;
   --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
   --border: 240 5.9% 90%;
   --input: 240 5.9% 90%;
   --ring: 240 5.9% 10%;
   --primary: 240 5.9% 10%;
   --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
   --muted: 240 4.8% 95.9%;
   --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 98%;
+  --sidebar: 240 4.8% 97.9%;
   --radius: 0.5rem;
 }
 
@@ -28,15 +34,22 @@
     --foreground: 0 0% 98%;
     --card: 240 10% 5.9%;
     --card-foreground: 0 0% 98%;
+    --popover: 240 10% 5.9%;
+    --popover-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
     --primary: 0 0% 98%;
     --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 98%;
+    --sidebar: 240 10% 2.9%;
   }
 }
 
@@ -45,15 +58,22 @@
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-sidebar: hsl(var(--sidebar));
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);

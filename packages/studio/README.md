@@ -61,27 +61,48 @@ export const {
 } = createStudioTasks(studioConfig);
 ```
 
-**Client shell** — derive the client-safe config server-side and render `<Studio />` once, above your own UI:
+**Client shell** — derive the client-safe config server-side and render `<Studio />` once; it owns the full UI (shell, gallery, generate controls) and every context descendants need. `onSignOut`/`imageLoader` are functions, so an async Server Component can't pass them directly — give `<Studio />` a thin `"use client"` wrapper for those:
+
+```tsx
+// app/studio/studio-client.tsx
+"use client";
+import type { StudioClientConfig } from "@two-71/studio";
+import { Studio, type StudioUser } from "@two-71/studio/client";
+import { signOut } from "@/lib/auth-client";
+
+export function StudioClient({
+  config,
+  user,
+}: {
+  config: StudioClientConfig;
+  user: StudioUser;
+}) {
+  return (
+    <Studio
+      config={config}
+      loginUrl="/login"
+      onSignOut={() => signOut()}
+      user={user}
+    />
+  );
+}
+```
 
 ```tsx
 // app/studio/page.tsx
 import { deriveClientConfig } from "@two-71/studio";
-import { Studio } from "@two-71/studio/client";
 import { studioConfig } from "@/studio.config";
+import { StudioClient } from "./studio-client";
 
 export default async function StudioPage() {
   const session = await getSession();
   const clientConfig = deriveClientConfig(studioConfig);
 
-  return (
-    <Studio config={clientConfig} user={session.user}>
-      <StudioContent />
-    </Studio>
-  );
+  return <StudioClient config={clientConfig} user={session.user} />;
 }
 ```
 
-`deriveClientConfig` strips workflow graphs and every provider/secret — never pass the full `StudioConfig` to the client. Inside `<Studio />`, descendants call `useStudioConfig()` / `useStudioUser()` and hit the mounted routes directly (`/api/studio/generate/run`, `/api/studio/generate/video`, `/api/studio/generations`, `/api/studio/balance`) — see `apps/demo/components/studio-content.tsx` for a minimal example.
+`deriveClientConfig` strips workflow graphs and every provider/secret — never pass the full `StudioConfig` to the client. See `apps/demo/app/studio` for a working example.
 
 ## License
 

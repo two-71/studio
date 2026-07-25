@@ -1,10 +1,9 @@
 import { deriveClientConfig } from "@two-71/studio";
-import { Studio } from "@two-71/studio/client";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { StudioContent } from "@/components/studio-content";
 import { auth } from "@/lib/auth";
 import { studioConfig } from "@/studio.config";
+import { StudioClient } from "./studio-client";
 
 export default async function StudioPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -17,9 +16,5 @@ export default async function StudioPage() {
   // allowed to cross into the client tree.
   const clientConfig = deriveClientConfig(studioConfig);
 
-  return (
-    <Studio config={clientConfig} user={session.user}>
-      <StudioContent />
-    </Studio>
-  );
+  return <StudioClient config={clientConfig} user={session.user} />;
 }

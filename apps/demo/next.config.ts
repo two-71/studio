@@ -10,11 +10,10 @@ const nextConfig: NextConfig = {
   // bundled into the server output.
   serverExternalPackages: ["@resvg/resvg-js"],
   // Proxies Trigger.dev's realtime long-polls through this app's own domain
-  // instead of the browser talking to api.trigger.dev directly. Required by
-  // any consumer of @trigger.dev/react-hooks reading generation status from
-  // @two-71/studio/server's realtime token (this demo currently polls the
-  // generations endpoint instead — see components/studio-content.tsx — but
-  // the rewrite is documented here as the wiring a host needs either way).
+  // instead of the browser talking to api.trigger.dev directly. Required
+  // because <Studio />'s generation-status components (@two-71/studio/client)
+  // read live progress via @trigger.dev/react-hooks against the realtime
+  // token @two-71/studio/server's routes issue.
   async rewrites() {
     return [
       {

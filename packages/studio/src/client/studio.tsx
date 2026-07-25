@@ -1,31 +1,54 @@
 "use client";
 
-// The <Studio /> root (spec §4.7 + §10 A2.2). Host apps render this once,
-// passing the serializable StudioClientConfig (derived server-side via
+// The <Studio /> root (spec §3.1 + §4.7 + §10 A2.2). Host apps render this
+// once, passing the serializable StudioClientConfig (derived server-side via
 // deriveClientConfig — never the full StudioConfig with secrets/workflow
-// graphs) and the signed-in user, then nest their own shell layout as
-// children. This is the only place StudioConfigProvider/StudioUserProvider
-// need to be wired, so every descendant can call useStudioConfig()/
-// useStudioUser() instead of drilling props through the host's layout.
+// graphs) and the signed-in user. <Studio> owns the full component tree
+// (StudioShell and everything under it) and every context descendants need:
+// config, user, the ky HTTP client, and the per-mount zustand store. Hosts
+// that need imageLoader/onSignOut — functions, which can't cross the
+// server/client boundary as props from an async Server Component — pass them
+// here directly; <Studio> merges them into the config it provides.
 
-import type { ReactNode } from "react";
+import { useState } from "react";
 import type { StudioClientConfig } from "../config/types";
+import { StudioShell } from "./components/studio-shell";
+import { createStudioStore, StudioStoreContext } from "./store/studio-store";
 import { StudioConfigProvider } from "./studio-config-provider";
+import { StudioHttpProvider } from "./studio-http-context";
 import type { StudioUser } from "./studio-user-context";
 import { StudioUserProvider } from "./studio-user-context";
 
 export function Studio({
   config,
   user,
-  children,
+  imageLoader,
+  onSignOut,
+  loginUrl,
 }: {
   config: StudioClientConfig;
   user: StudioUser;
-  children: ReactNode;
+  imageLoader?: StudioClientConfig["imageLoader"];
+  onSignOut?: StudioClientConfig["onSignOut"];
+  loginUrl?: string;
 }) {
+  const resolvedConfig: StudioClientConfig = {
+    ...config,
+    imageLoader: imageLoader ?? config.imageLoader,
+    onSignOut: onSignOut ?? config.onSignOut,
+    loginUrl: loginUrl ?? config.loginUrl,
+  };
+  const [store] = useState(() => createStudioStore(resolvedConfig));
+
   return (
-    <StudioConfigProvider config={config}>
-      <StudioUserProvider user={user}>{children}</StudioUserProvider>
+    <StudioConfigProvider config={resolvedConfig}>
+      <StudioUserProvider user={user}>
+        <StudioHttpProvider apiBasePath={resolvedConfig.apiBasePath}>
+          <StudioStoreContext.Provider value={store}>
+            <StudioShell />
+          </StudioStoreContext.Provider>
+        </StudioHttpProvider>
+      </StudioUserProvider>
     </StudioConfigProvider>
   );
 }

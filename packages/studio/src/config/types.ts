@@ -251,8 +251,13 @@ export interface StudioConfig {
 // --- Client/server split (§4.7) ---------------------------------------------
 
 // StudioModel minus the workflow graph/node map — the only field that must
-// never reach the client.
-export type StudioClientModel = Omit<StudioModel, "workflow">;
+// never reach the client. `coinCost` is derived (not part of the server
+// model): deriveClientConfig fills it in from billing.costFor so the client
+// can total/display exact costs without the billing provider itself crossing
+// the server/client boundary (coinLabel stays the display-only tier string).
+export type StudioClientModel = Omit<StudioModel, "workflow"> & {
+  coinCost: number;
+};
 
 // Not given a literal interface in the spec (only prose: "models minus
 // workflow graphs, branding, coin name, topUpUrl, feature flags for
@@ -268,4 +273,25 @@ export interface StudioClientConfig {
     loras: boolean;
     poses: boolean;
   };
+  // Image-to-video pricing/options surfaced to the client (A2 gap: the spec's
+  // VideoModelSpec has durations but no client-visible per-second cost).
+  // coinsPerSecond is derived from billing.videoCost(1) by deriveClientConfig.
+  video?: { durations: number[]; coinsPerSecond: number };
+  // Route prefix the client's ky instance is created with (studio-http-context.tsx).
+  // Default "/api/studio" — override only if the host mounts createStudioHandlers
+  // somewhere else.
+  apiBasePath?: string;
+  // Client-only extras: never set by deriveClientConfig (functions can't cross
+  // the server/client boundary as props from an async Server Component). <Studio>
+  // merges its own `imageLoader`/`onSignOut` props into the config it provides,
+  // so a host that needs either renders <Studio> from its own "use client"
+  // wrapper instead of directly from a server page.
+  imageLoader?: (props: {
+    src: string;
+    width: number;
+    quality?: number;
+  }) => string;
+  onSignOut?: () => Promise<void>;
+  // Redirect target after onSignOut resolves. Default "/login".
+  loginUrl?: string;
 }

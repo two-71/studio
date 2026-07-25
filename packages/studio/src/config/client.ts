@@ -10,7 +10,10 @@ import type {
 
 export function deriveClientConfig(config: StudioConfig): StudioClientConfig {
   const models: StudioClientModel[] = config.models.map(
-    ({ workflow: _workflow, ...rest }) => rest
+    ({ workflow: _workflow, ...rest }) => ({
+      ...rest,
+      coinCost: config.billing.costFor(rest.id),
+    })
   );
 
   return {
@@ -24,5 +27,11 @@ export function deriveClientConfig(config: StudioConfig): StudioClientConfig {
       loras: models.some((model) => (model.loras?.length ?? 0) > 0),
       poses: models.some((model) => (model.poses?.length ?? 0) > 0),
     },
+    video: config.video
+      ? {
+          durations: config.video.durations,
+          coinsPerSecond: config.billing.videoCost(1),
+        }
+      : undefined,
   };
 }
