@@ -1,0 +1,10 @@
+[install]
+# Flat node_modules (like npm/yarn classic) instead of bun's default
+# peer-isolated layout. Isolated installs create a separate physical copy of
+# a package per distinct peer-dependency resolution context (e.g.
+# `drizzle-orm@0.45.2+<hash>`), which breaks structural type identity for
+# packages like drizzle-orm whose column classes rely on protected fields —
+# TypeScript then sees "the same" table built from two different classes.
+# Hoisted linking guarantees one physical copy per version across the
+# workspace.
+linker = "hoisted"

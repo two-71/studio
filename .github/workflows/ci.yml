@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun x ultracite check
+
+      - name: Build demo
+        # Dummy values only — next build's "collect page data" phase imports
+        # apps/demo/studio.config.ts and lib/db/index.ts, which throw at
+        # module load if these are unset (see requireEnv / DATABASE_URL
+        # checks). No real credentials are needed to typecheck/bundle.
+        env:
+          DATABASE_URL: postgres://ci:ci@localhost:5432/ci
+          BETTER_AUTH_SECRET: ci-dummy-secret-do-not-use-in-prod
+          BETTER_AUTH_URL: http://localhost:3000
+          TRIGGER_SECRET_KEY: tr_dev_ci-dummy
+          TRIGGER_PROJECT_REF: proj_ci-dummy
+          RUNPOD_API_KEY: ci-dummy
+          RUNPOD_ENDPOINT_ID: ci-dummy
+          R2_ACCOUNT_ID: ci-dummy
+          R2_ACCESS_KEY_ID: ci-dummy
+          R2_SECRET_ACCESS_KEY: ci-dummy
+          R2_BUCKET: ci-dummy
+          R2_PUBLIC_URL: https://ci-dummy.example.com
+        run: |
+          if [ -d apps/demo ]; then
+            bun run --filter='./apps/demo' build
+          else
+            echo "apps/demo not present yet, skipping build"
+          fi

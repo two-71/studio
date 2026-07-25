@@ -1,0 +1,31 @@
+{
+  "name": "@two-71/studio",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server/index.ts",
+    "./client": "./src/client/index.ts",
+    "./tasks": "./src/tasks/index.ts",
+    "./schema": "./src/schema/index.ts"
+  },
+  "peerDependencies": {
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "@trigger.dev/sdk": "^4.5.4",
+    "@trigger.dev/react-hooks": "^4.5.4",
+    "drizzle-orm": "^0.45.2",
+    "@tanstack/react-query": "^5.100.11",
+    "zod": "^4.4.3"
+  },
+  "dependencies": {
+    "zustand": "^5.0.13",
+    "@aws-sdk/client-s3": "^3.1071.0",
+    "@resvg/resvg-js": "^2.6.2"
+  }
+}
