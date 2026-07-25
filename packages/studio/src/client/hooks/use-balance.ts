@@ -11,7 +11,8 @@ export function useBalance() {
   const http = useStudioHttp();
   return useQuery({
     queryKey: BALANCE_QUERY_KEY,
-    queryFn: () => http.get("balance").json<{ balance: number }>(),
+    // balance is null when the host's billing provider is unlimited/free.
+    queryFn: () => http.get("balance").json<{ balance: number | null }>(),
   });
 }
 

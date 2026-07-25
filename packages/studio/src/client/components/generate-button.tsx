@@ -34,7 +34,7 @@ export function GenerateButton({ className }: { className?: string }) {
 
   const handleGenerate = async () => {
     const balance = data?.balance;
-    if (balance !== undefined && balance < cost) {
+    if (typeof balance === "number" && balance < cost) {
       const topUpUrl = config.topUpUrl;
       toast.error(
         `Need ${formatCoinName(config.coinName, { count: cost })}, you have ${formatCoinName(config.coinName, { count: balance })}`,

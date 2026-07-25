@@ -80,24 +80,27 @@ export function StudioHeader() {
           ))}
         </div>
 
-        <div className="flex h-9 items-center gap-1 rounded-full bg-black/80 py-1 pr-1 pl-3 ring-1 ring-white/10">
-          <IconCoins className="size-5 text-pink-500" />
-          <span className="px-1.5 font-semibold text-sm text-white">
-            {balance ? balance.balance.toLocaleString() : "—"}
-          </span>
-          {config.topUpUrl ? (
-            <Link
-              aria-label={`Buy ${formatCoinName(config.coinName, { plural: true, capitalize: true })}`}
-              className={cn(
-                buttonVariants({ variant: "accent" }),
-                "h-full px-4"
-              )}
-              href={config.topUpUrl}
-            >
-              Buy
-            </Link>
-          ) : null}
-        </div>
+        {/* null balance = unlimited billing (free demo) — no coin pill at all */}
+        {balance?.balance === null ? null : (
+          <div className="flex h-9 items-center gap-1 rounded-full bg-black/80 py-1 pr-1 pl-3 ring-1 ring-white/10">
+            <IconCoins className="size-5 text-pink-500" />
+            <span className="px-1.5 font-semibold text-sm text-white">
+              {balance ? balance.balance.toLocaleString() : "—"}
+            </span>
+            {config.topUpUrl ? (
+              <Link
+                aria-label={`Buy ${formatCoinName(config.coinName, { plural: true, capitalize: true })}`}
+                className={cn(
+                  buttonVariants({ variant: "accent" }),
+                  "h-full px-4"
+                )}
+                href={config.topUpUrl}
+              >
+                Buy
+              </Link>
+            ) : null}
+          </div>
+        )}
 
         <DropdownMenu>
           <DropdownMenuTrigger
