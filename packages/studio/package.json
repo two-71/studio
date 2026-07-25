@@ -1,7 +1,17 @@
 {
   "name": "@two-71/studio",
   "version": "0.1.0",
+  "description": "Self-hostable AI image/video generation studio for Next.js — RunPod ComfyUI workflows, Trigger.dev tasks, pluggable billing/moderation/storage providers",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/two-71/studio.git",
+    "directory": "packages/studio"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": ["src", "README.md", "LICENSE"],
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit"
