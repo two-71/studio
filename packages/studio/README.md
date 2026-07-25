@@ -12,6 +12,21 @@ bun add @two-71/studio
 
 Peer dependencies (install alongside): `next`, `react`, `react-dom`, `@trigger.dev/sdk`, `@trigger.dev/react-hooks`, `drizzle-orm`, `@tanstack/react-query`, `zod`.
 
+The package ships TypeScript source, so your app must compile and scan it:
+
+```ts
+// next.config.ts
+transpilePackages: ["@two-71/studio"],
+```
+
+```css
+/* globals.css — Tailwind never scans node_modules on its own; without this
+   the studio's utility classes (including responsive variants) are missing */
+@source "../node_modules/@two-71/studio/src";
+```
+
+(Adjust the `@source` path relative to your CSS file's location.)
+
 ## Entry points
 
 | Import | Contains |
