@@ -1,7 +1,8 @@
-// Demo StudioConfig (spec §3.1, §9.2, §10 B1.2): free billing, open
-// moderation, one SFW FLUX.1-schnell image model, no loras/poses/reference,
-// no prompts (enhance/title off — both fall back to their documented
-// defaults per spec §4.4), no watermark spec, no notify hook.
+// Demo StudioConfig (spec §3.1, §9.2, §10 B1.2): guest billing, open
+// moderation, one SFW Krea 2 image model (with style loras + identity-edit
+// reference support) and an LTX 2.3 image-to-video model, no prompts
+// (enhance/title off — both fall back to their documented defaults per
+// spec §4.4), no watermark spec, no notify hook.
 //
 // No "server-only" import guard, matching the package's own handlers.ts: the
 // same config module is imported by both Next route handlers and
@@ -16,6 +17,7 @@ import {
   r2Storage,
   type StudioConfig,
   type StudioModel,
+  type VideoModelSpec,
 } from "@two-71/studio";
 import { and, count, eq, gte } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -25,7 +27,8 @@ import {
   GUEST_DAILY_LIMIT,
   guestFromHeaders,
 } from "@/lib/guest";
-import fluxSchnellGraph from "./workflows/flux-schnell.json";
+import krea2Graph from "./workflows/krea2.json";
+import ltx23Graph from "./workflows/ltx2-3.json";
 
 // Account mode (uncomment to restore better-auth logins — see the matching
 // commented blocks in app/studio/page.tsx and app/studio/studio-client.tsx;
@@ -89,33 +92,77 @@ const guestBilling: BillingProvider = {
   coinName: "generations",
 };
 
-// See README.md's "RunPod endpoint setup" for how this graph was authored
-// and how it maps to `runpod/worker-comfyui`. Single ratio only: the
-// vanilla worker image ships no custom resolution-selector node, so
-// `EmptySD3LatentImage` is fixed at 1024x1024 and `NodeMap.aspectRatio` is
-// left unmapped.
-const fluxSchnell: StudioModel = {
-  id: "flux-schnell",
-  name: "FLUX.1 Schnell",
-  description: "Fast open-weight text-to-image model (Apache 2.0).",
-  ratios: ["1:1"],
+// Official Krea 2 (turbo fp8) text-to-image with two SFW style loras and
+// identity-edit reference support. The workflow's pose/depth-control branch
+// exists in the graph but stays dormant (no PoseSpec entries = pose modal
+// hidden, poseToggle unmapped so its boolean node keeps its `false`
+// default). See the endpoint's Dockerfile for the exact model files.
+const krea2: StudioModel = {
+  id: "krea-2",
+  name: "Krea 2",
+  description: "Official Krea 2 turbo — fast, photographic SFW model.",
+  ratios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
   resolutions: ["Standard"],
-  supportsReference: false,
+  supportsReference: true,
+  loras: [
+    {
+      id: "ultrareal",
+      name: "UltraReal",
+      triggerWords: "photo, amateur photography",
+      slotKey: "lora_2",
+    },
+    {
+      id: "phone-photography",
+      name: "Phone Photography",
+      triggerWords: "phone photo",
+      slotKey: "lora_3",
+    },
+  ],
   workflow: {
-    graph: fluxSchnellGraph,
+    graph: krea2Graph,
     nodes: {
-      prompt: { node: "4", input: "text" },
-      seed: { node: "7", input: "seed" },
+      prompt: { node: "4", input: "value" },
+      seed: { node: "5", input: "seed" },
+      aspectRatio: { node: "40", input: "aspect_ratio" },
+      referenceToggle: { node: "2", input: "value" },
+      referenceImage: { node: "19", input: "image" },
+      // Identity-edit lora rides in the same power-loader; enabled only
+      // when a reference image is attached.
+      referenceLoraToggle: { node: "9", input: "lora_1" },
+      loras: {
+        ultrareal: { node: "9", input: "lora_2" },
+        "phone-photography": { node: "9", input: "lora_3" },
+      },
+    },
+  },
+};
+
+// LTX 2.3 (distilled, split files) image-to-video, single pass, silent.
+// The mxSlider frame-count node feeds a +1 math node so the sampler sees
+// the 8n+1 frame count LTX expects.
+const ltx23: VideoModelSpec = {
+  id: "ltx-2-3",
+  durations: [3, 5],
+  fps: 24,
+  workflow: {
+    graph: ltx23Graph,
+    nodes: {
+      prompt: { node: "536", input: "text" },
+      seed: { node: "524", input: "seed" },
+      sourceImage: { node: "837", input: "image" },
+      framesNode: { node: "796", input: "Xi" },
     },
   },
 };
 
 export const studioConfig: StudioConfig = {
-  models: [fluxSchnell],
+  models: [krea2],
+  video: ltx23,
   runpod: {
     apiKey: requireEnv("RUNPOD_API_KEY"),
     endpoints: {
-      "flux-schnell": requireEnv("RUNPOD_ENDPOINT_ID"),
+      "krea-2": requireEnv("RUNPOD_ENDPOINT_ID"),
+      "ltx-2-3": requireEnv("RUNPOD_VIDEO_ENDPOINT_ID"),
     },
   },
   storage: r2Storage({

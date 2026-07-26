@@ -1,0 +1,414 @@
+{
+  "1": {
+    "inputs": {
+      "value": false
+    },
+    "class_type": "PrimitiveBoolean",
+    "_meta": {
+      "title": "OPTION — Control Pose"
+    }
+  },
+  "2": {
+    "inputs": {
+      "value": false
+    },
+    "class_type": "PrimitiveBoolean",
+    "_meta": {
+      "title": "OPTION — Image Reference"
+    }
+  },
+  "4": {
+    "inputs": {
+      "value": "(PROMPT)"
+    },
+    "class_type": "PrimitiveStringMultiline",
+    "_meta": {
+      "title": "Prompt / edit instruction"
+    }
+  },
+  "5": {
+    "inputs": {
+      "seed": -1
+    },
+    "class_type": "Seed (rgthree)",
+    "_meta": {
+      "title": "Seed (rgthree)"
+    }
+  },
+  "6": {
+    "inputs": {
+      "unet_name": "krea2_turbo_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "Load Diffusion Model"
+    }
+  },
+  "7": {
+    "inputs": {
+      "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+      "type": "krea2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load CLIP"
+    }
+  },
+  "8": {
+    "inputs": {
+      "vae_name": "qwen_image_vae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "9": {
+    "inputs": {
+      "PowerLoraLoaderHeaderWidget": {
+        "type": "PowerLoraLoaderHeaderWidget"
+      },
+      "lora_1": {
+        "on": false,
+        "lora": "krea2_identity_edit_v1_2.safetensors",
+        "strength": 1
+      },
+      "lora_2": {
+        "on": false,
+        "lora": "lenovo_krea2.safetensors",
+        "strength": 1
+      },
+      "lora_3": {
+        "on": false,
+        "lora": "phone_photography_2025_krea2.safetensors",
+        "strength": 1
+      },
+      "➕ Add Lora": "",
+      "model": ["6", 0]
+    },
+    "class_type": "Power Lora Loader (rgthree)",
+    "_meta": {
+      "title": "Custom LoRAs"
+    }
+  },
+  "11": {
+    "inputs": {
+      "image": "example.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Pose depth map"
+    }
+  },
+  "12": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "megapixels": 1,
+      "resolution_steps": 1,
+      "image": ["11", 0]
+    },
+    "class_type": "ImageScaleToTotalPixels",
+    "_meta": {
+      "title": "Scale Image to Total Pixels"
+    }
+  },
+  "13": {
+    "inputs": {
+      "image": ["12", 0]
+    },
+    "class_type": "GetImageSize",
+    "_meta": {
+      "title": "Get Image Size"
+    }
+  },
+  "14": {
+    "inputs": {
+      "width": ["43", 1],
+      "height": ["43", 2],
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Latent @ depth size"
+    }
+  },
+  "16": {
+    "inputs": {
+      "resize": "match_latent_size",
+      "upscale_method": "lanczos",
+      "crop": "center",
+      "channel_mode": "grayscale",
+      "normalize": "per_image_minmax",
+      "invert": false,
+      "batch_mode": "independent_images",
+      "control_image": ["43", 0],
+      "vae": ["8", 0],
+      "latent": ["29", 0]
+    },
+    "class_type": "Krea2ControlImageEncode",
+    "_meta": {
+      "title": "Krea2 Control Image Encode"
+    }
+  },
+  "17": {
+    "inputs": {
+      "model": ["42", 0],
+      "control_latent": ["16", 0]
+    },
+    "class_type": "Krea2ControlApply",
+    "_meta": {
+      "title": "Krea2 Control Apply"
+    }
+  },
+  "18": {
+    "inputs": {
+      "switch": ["1", 0],
+      "on_false": ["9", 0],
+      "on_true": ["17", 0]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "Control Pose?"
+    }
+  },
+  "19": {
+    "inputs": {
+      "image": "example.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Identity reference"
+    }
+  },
+  "20": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "megapixels": 1,
+      "resolution_steps": 1,
+      "image": ["19", 0]
+    },
+    "class_type": "ImageScaleToTotalPixels",
+    "_meta": {
+      "title": "Scale Image to Total Pixels"
+    }
+  },
+  "21": {
+    "inputs": {
+      "image": ["20", 0]
+    },
+    "class_type": "GetImageSize",
+    "_meta": {
+      "title": "Get Image Size"
+    }
+  },
+  "22": {
+    "inputs": {
+      "width": ["41", 1],
+      "height": ["41", 2],
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Latent @ reference size"
+    }
+  },
+  "23": {
+    "inputs": {
+      "pixels": ["41", 0],
+      "vae": ["8", 0]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "Reference latent"
+    }
+  },
+  "25": {
+    "inputs": {
+      "ref_start_sigma": 1,
+      "model": ["18", 0],
+      "source_latent": ["23", 0]
+    },
+    "class_type": "Krea2EditModelPatch",
+    "_meta": {
+      "title": "Krea2 Edit (source patch)"
+    }
+  },
+  "26": {
+    "inputs": {
+      "switch": ["2", 0],
+      "on_false": ["18", 0],
+      "on_true": ["25", 0]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "Image Reference?"
+    }
+  },
+  "27": {
+    "inputs": {
+      "width": ["40", 0],
+      "height": ["40", 1],
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Default resolution (no options)"
+    }
+  },
+  "28": {
+    "inputs": {
+      "switch": ["2", 0],
+      "on_false": ["27", 0],
+      "on_true": ["22", 0]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "Size: reference?"
+    }
+  },
+  "29": {
+    "inputs": {
+      "switch": ["1", 0],
+      "on_false": ["28", 0],
+      "on_true": ["14", 0]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "Size: pose wins"
+    }
+  },
+  "30": {
+    "inputs": {
+      "text": ["4", 0],
+      "clip": ["7", 0]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Text prompt (no reference)"
+    }
+  },
+  "31": {
+    "inputs": {
+      "prompt": ["4", 0],
+      "grounding_px": 1024,
+      "clip": ["7", 0],
+      "image": ["20", 0]
+    },
+    "class_type": "Krea2EditGroundedEncode",
+    "_meta": {
+      "title": "Grounded prompt (reference)"
+    }
+  },
+  "32": {
+    "inputs": {
+      "switch": ["2", 0],
+      "on_false": ["30", 0],
+      "on_true": ["31", 0]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "Prompt: grounded?"
+    }
+  },
+  "33": {
+    "inputs": {
+      "conditioning": ["32", 0]
+    },
+    "class_type": "ConditioningZeroOut",
+    "_meta": {
+      "title": "ConditioningZeroOut"
+    }
+  },
+  "34": {
+    "inputs": {
+      "seed": ["5", 0],
+      "steps": 8,
+      "cfg": 1,
+      "sampler_name": "euler",
+      "scheduler": "beta",
+      "denoise": 1,
+      "model": ["26", 0],
+      "positive": ["32", 0],
+      "negative": ["33", 0],
+      "latent_image": ["29", 0]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "35": {
+    "inputs": {
+      "samples": ["34", 0],
+      "vae": ["8", 0]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "36": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": ["35", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "40": {
+    "inputs": {
+      "aspect_ratio": "1:1 (Square)",
+      "megapixels": 1,
+      "multiple": 8
+    },
+    "class_type": "ResolutionSelector",
+    "_meta": {
+      "title": "Resolution Selector"
+    }
+  },
+  "41": {
+    "inputs": {
+      "width": ["21", 0],
+      "height": ["21", 1],
+      "interpolation": "nearest",
+      "method": "fill / crop",
+      "condition": "always",
+      "multiple_of": 64,
+      "image": ["20", 0]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "🔧 Image Resize"
+    }
+  },
+  "42": {
+    "inputs": {
+      "lora_name": "depth-control-lora.safetensors",
+      "strength": 1,
+      "model": ["9", 0]
+    },
+    "class_type": "Krea2ControlLoRALoader",
+    "_meta": {
+      "title": "Krea2 Control LoRA Loader"
+    }
+  },
+  "43": {
+    "inputs": {
+      "width": ["13", 0],
+      "height": ["13", 1],
+      "interpolation": "nearest",
+      "method": "fill / crop",
+      "condition": "always",
+      "multiple_of": 64,
+      "image": ["12", 0]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "🔧 Image Resize"
+    }
+  }
+}
