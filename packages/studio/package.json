@@ -1,6 +1,6 @@
 {
   "name": "@two-71/studio",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Self-hostable AI image/video generation studio for Next.js — RunPod ComfyUI workflows, Trigger.dev tasks, pluggable billing/moderation/storage providers",
   "license": "MIT",
   "repository": {

@@ -18,6 +18,7 @@ import { StudioConfigProvider } from "./studio-config-provider";
 import { StudioHttpProvider } from "./studio-http-context";
 import type { StudioUser } from "./studio-user-context";
 import { StudioUserProvider } from "./studio-user-context";
+import { TooltipProvider } from "./ui/tooltip";
 
 export function Studio({
   config,
@@ -45,7 +46,11 @@ export function Studio({
       <StudioUserProvider user={user}>
         <StudioHttpProvider apiBasePath={resolvedConfig.apiBasePath}>
           <StudioStoreContext.Provider value={store}>
-            <StudioShell />
+            {/* Studio components use Tooltip internally — provide the context
+                here so hosts don't need their own TooltipProvider. */}
+            <TooltipProvider>
+              <StudioShell />
+            </TooltipProvider>
           </StudioStoreContext.Provider>
         </StudioHttpProvider>
       </StudioUserProvider>
