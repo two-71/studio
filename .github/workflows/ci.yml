@@ -37,6 +37,7 @@ jobs:
           TRIGGER_PROJECT_REF: proj_ci-dummy
           RUNPOD_API_KEY: ci-dummy
           RUNPOD_ENDPOINT_ID: ci-dummy
+          RUNPOD_VIDEO_ENDPOINT_ID: ci-dummy
           R2_ACCOUNT_ID: ci-dummy
           R2_ACCESS_KEY_ID: ci-dummy
           R2_SECRET_ACCESS_KEY: ci-dummy
