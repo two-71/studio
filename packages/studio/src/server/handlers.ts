@@ -187,8 +187,12 @@ async function handleGenerateRun(
     return model?.supportsReference;
   })?.generationId;
 
+  // Preset poses stage to storage too: the tasks only ever read pose bytes
+  // through poseImageKey, so skipping the upload would leave the workflow's
+  // pose branch switched off. posePreset still rides along so the row
+  // displays the preset's /public path instead of the staged copy.
   const [poseImageKey, referenceImageKey] = await Promise.all([
-    poseControlId && input.poseImage && !input.posePreset
+    poseControlId && input.poseImage
       ? uploadControlImage(config, poseControlId, "pose", input.poseImage)
       : undefined,
     referenceControlId && input.referenceImage

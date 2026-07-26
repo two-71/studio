@@ -92,18 +92,29 @@ const guestBilling: BillingProvider = {
   coinName: "generations",
 };
 
-// Official Krea 2 (turbo fp8) text-to-image with two SFW style loras and
-// identity-edit reference support. The workflow's pose/depth-control branch
-// exists in the graph but stays dormant (no PoseSpec entries = pose modal
-// hidden, poseToggle unmapped so its boolean node keeps its `false`
-// default). See the endpoint's Dockerfile for the exact model files.
+// Official Krea 2 (turbo fp8) text-to-image with two SFW style loras,
+// identity-edit reference support, and depth-map pose control (preset depth
+// maps in public/poses). See the endpoint's Dockerfile for the exact model
+// files.
 const krea2: StudioModel = {
   id: "krea-2",
   name: "Krea 2",
-  description: "Official Krea 2 turbo — fast, photographic SFW model.",
+  description: "Latest image generation model.",
   ratios: ["1:1", "16:9", "9:16", "4:3", "3:4", "21:9"],
   resolutions: ["Standard"],
   supportsReference: true,
+  poses: [
+    {
+      id: "crossed-legs-on-floor",
+      name: "Crossed Legs on Floor",
+      controlImageUrl: "/poses/crossed-legs-on-floor.png",
+    },
+    {
+      id: "sitting-on-stairs",
+      name: "Sitting on Stairs",
+      controlImageUrl: "/poses/sitting-on-stairs.png",
+    },
+  ],
   loras: [
     {
       id: "ultrareal",
@@ -124,6 +135,8 @@ const krea2: StudioModel = {
       prompt: { node: "4", input: "value" },
       seed: { node: "5", input: "seed" },
       aspectRatio: { node: "40", input: "aspect_ratio" },
+      poseToggle: { node: "1", input: "value" },
+      poseImage: { node: "11", input: "image" },
       referenceToggle: { node: "2", input: "value" },
       referenceImage: { node: "19", input: "image" },
       // Identity-edit lora rides in the same power-loader; enabled only

@@ -36,8 +36,9 @@ export const generateImagePayloadSchema = z.object({
   priceCoins: z.number().int().nonnegative(),
   ratio: z.enum(RATIO_KEYS),
   loras: z.array(z.string()).default([]),
-  // Preset id (bundled asset, no upload needed) vs. a custom pose the caller
-  // staged to storage. Only one is ever set.
+  // Pose bytes always arrive via poseImageKey; posePreset additionally
+  // carries the preset's public path so the row displays it instead of the
+  // staged copy's URL.
   posePreset: z.string().optional(),
   poseImageKey: z.string().optional(),
   referenceImageKey: z.string().optional(),
@@ -181,7 +182,7 @@ export function createGenerateImageTask(
     // charged, so attaching first never risks a phantom refund.
     // Control-input previews: the API route staged these bytes at their final
     // key inside the generation's folder, so the row just records the public
-    // URL — no re-upload. A preset pose only stores its id.
+    // URL — no re-upload. A preset pose displays its public path instead.
     const referenceImageUrl = payload.referenceImageKey
       ? config.storage.publicUrl(payload.referenceImageKey)
       : undefined;
