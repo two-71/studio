@@ -161,18 +161,12 @@ export function useGenerate() {
     if (models.length === 0) {
       return;
     }
-    const useControls = models.some(
-      (model) =>
-        model.supportsReference ||
-        (model.loras?.length ?? 0) > 0 ||
-        (model.poses?.length ?? 0) > 0
-    );
-
     setGenerating(true);
     try {
-      const controlImages = useControls
-        ? await encodeControlImages({ poseImage, referenceImage })
-        : {};
+      const controlImages = await encodeControlImages({
+        poseImage,
+        referenceImage,
+      });
       if (!controlImages) {
         return;
       }
@@ -206,7 +200,7 @@ export function useGenerate() {
             ratio,
             resolution,
             controlImages,
-            enabledLoraIds: useControls ? enabledLoraIds : [],
+            enabledLoraIds,
           })
         );
       } catch (err) {

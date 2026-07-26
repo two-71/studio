@@ -6,7 +6,6 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { MAX_CONTROL_IMAGE_BYTES, nearestRatio } from "../constants";
 import { useStudioStore } from "../store/studio-store";
-import { useStudioConfig } from "../studio-config-provider";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -17,23 +16,14 @@ import {
 import { PanelSection } from "./panel-section";
 
 export function ReferencePicker() {
-  const config = useStudioConfig();
   const referenceImage = useStudioStore((state) => state.referenceImage);
   const referenceImageOversized = useStudioStore(
     (state) => state.referenceImageOversized
   );
   const setReferenceImage = useStudioStore((state) => state.setReferenceImage);
   const setRatio = useStudioStore((state) => state.setRatio);
-  const selectedModelIds = useStudioStore((state) => state.selectedModelIds);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
-
-  const showReference = config.models.some(
-    (model) => selectedModelIds.includes(model.id) && model.supportsReference
-  );
-  if (!showReference) {
-    return null;
-  }
 
   const handleFile = (file: File | undefined) => {
     if (!file) {

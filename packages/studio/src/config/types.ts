@@ -74,9 +74,10 @@ export interface StudioModel {
   coinLabel?: string; // display only; cost comes from billing.costFor
   ratios: RatioKey[];
   resolutions: ResolutionKey[];
-  supportsReference?: boolean; // enables reference-image picker
-  loras?: LoraSpec[]; // empty/absent = LoRA modal hidden
-  poses?: PoseSpec[]; // empty/absent = pose modal hidden
+  // Controls (reference/pose/LoRA UI) always render for every model; these
+  // lists only populate the pose/LoRA dialogs (empty/absent = empty dialog).
+  loras?: LoraSpec[];
+  poses?: PoseSpec[];
   workflow: WorkflowSpec;
   comingSoon?: boolean;
 }
@@ -265,7 +266,7 @@ export type StudioClientModel = Omit<StudioModel, "workflow"> & {
 
 // Not given a literal interface in the spec (only prose: "models minus
 // workflow graphs, branding, coin name, topUpUrl, feature flags for
-// enhance/loras/poses/video") — originated here.
+// enhance/video") — originated here.
 export interface StudioClientConfig {
   models: StudioClientModel[];
   branding?: BrandingSpec;
@@ -274,8 +275,6 @@ export interface StudioClientConfig {
   features: {
     enhance: boolean;
     video: boolean;
-    loras: boolean;
-    poses: boolean;
     // False when the billing provider is disabled (dummy/free): coin/cost UI
     // is hidden and the balance endpoint is never called.
     billing: boolean;

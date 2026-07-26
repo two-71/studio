@@ -147,25 +147,21 @@ async function handleGenerateRun(
   const requestId = crypto.randomUUID();
 
   // One row per model, created (in a single insert) before any slow work so
-  // the response can return the ids immediately. Loras/pose only apply to
-  // models whose catalog entry declares them (data-driven generalization of
-  // the single-CONTROL_MODEL_ID gate the route used before every model in
-  // the catalog carried its own capability flags).
-  const inputs: CreateGenerationInput[] = input.modelIds.map((modelId) => {
-    const model = config.models.find((m) => m.id === modelId);
-    return {
-      userId,
-      requestId,
-      modelId,
-      prompt: input.prompt,
-      seed: pinnedSeed ?? Math.floor(Math.random() * MAX_SEED),
-      loras: (model?.loras?.length ?? 0) > 0 ? input.loras : [],
-      pose: (model?.poses?.length ?? 0) > 0 ? input.posePreset : undefined,
-      ratio: input.ratio,
-      resolution: input.resolutionTier,
-      priceCoins: config.billing.costFor(modelId),
-    };
-  });
+  // the response can return the ids immediately. Every model accepts
+  // loras/pose; workflows without the matching nodes ignore them at build
+  // time (buildWorkflow only touches nodes the node map declares).
+  const inputs: CreateGenerationInput[] = input.modelIds.map((modelId) => ({
+    userId,
+    requestId,
+    modelId,
+    prompt: input.prompt,
+    seed: pinnedSeed ?? Math.floor(Math.random() * MAX_SEED),
+    loras: input.loras,
+    pose: input.posePreset,
+    ratio: input.ratio,
+    resolution: input.resolutionTier,
+    priceCoins: config.billing.costFor(modelId),
+  }));
   const rows = await queries.createGenerations(inputs);
   const generations = inputs.map((row, index) => ({
     generationId: rows[index]?.id ?? "",
@@ -175,33 +171,21 @@ async function handleGenerateRun(
     createdAt: rows[index]?.createdAt.toISOString() ?? "",
   }));
 
-  // Control images only apply to the model(s) whose workflow branches on
-  // them; stage them once into that model's generation folder so inputs and
-  // outputs share a prefix.
-  const poseControlId = generations.find((row) => {
-    const model = config.models.find((m) => m.id === row.modelId);
-    return (model?.poses?.length ?? 0) > 0;
-  })?.generationId;
-  const referenceControlId = generations.find((row) => {
-    const model = config.models.find((m) => m.id === row.modelId);
-    return model?.supportsReference;
-  })?.generationId;
-
+  // Control images are staged once into the first generation's folder so
+  // inputs and outputs share a prefix; every model's task reads them from
+  // the same keys.
+  //
   // Preset poses stage to storage too: the tasks only ever read pose bytes
   // through poseImageKey, so skipping the upload would leave the workflow's
   // pose branch switched off. posePreset still rides along so the row
   // displays the preset's /public path instead of the staged copy.
+  const controlId = generations[0]?.generationId;
   const [poseImageKey, referenceImageKey] = await Promise.all([
-    poseControlId && input.poseImage
-      ? uploadControlImage(config, poseControlId, "pose", input.poseImage)
+    controlId && input.poseImage
+      ? uploadControlImage(config, controlId, "pose", input.poseImage)
       : undefined,
-    referenceControlId && input.referenceImage
-      ? uploadControlImage(
-          config,
-          referenceControlId,
-          "reference",
-          input.referenceImage
-        )
+    controlId && input.referenceImage
+      ? uploadControlImage(config, controlId, "reference", input.referenceImage)
       : undefined,
   ]);
 

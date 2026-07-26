@@ -101,23 +101,18 @@ export function createGenerateImageTask(
       );
       return;
     }
-    // Only models whose workflow declares a pose toggle have pose/reference/
-    // lora branches; other models ignore those payload fields entirely.
-    const useControls = Boolean(model.workflow.nodes.poseToggle);
-
     metadata.set("step", "downloading-inputs");
     const [poseImage, referenceImage] = await logger.trace(
       "download-control-inputs",
       async (span) => {
         const images = await Promise.all([
-          useControls && payload.poseImageKey
+          payload.poseImageKey
             ? config.storage.getBase64(payload.poseImageKey)
             : Promise.resolve(undefined),
-          useControls && payload.referenceImageKey
+          payload.referenceImageKey
             ? config.storage.getBase64(payload.referenceImageKey)
             : Promise.resolve(undefined),
         ]);
-        span.setAttribute("useControls", useControls);
         span.setAttribute("pose.bytes", images[0]?.length ?? 0);
         span.setAttribute("reference.bytes", images[1]?.length ?? 0);
         return images;
@@ -149,7 +144,7 @@ export function createGenerateImageTask(
             seed: payload.seed,
             poseImage,
             referenceImage,
-            loras: useControls ? payload.loras : [],
+            loras: payload.loras,
             aspect_ratio: RATIO_TO_ASPECT_RATIO[payload.ratio],
           },
           token.url

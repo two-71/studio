@@ -37,8 +37,8 @@ export interface StudioState {
   selectedModelIds: string[];
   ratio: RatioKey;
   resolution: ResolutionKey;
-  // Single reference image as a data URL; only models with supportsReference
-  // consume it. Presence means it's sent with the run.
+  // Single reference image as a data URL; workflows without reference nodes
+  // ignore it. Presence means it's sent with the run.
   referenceImage: string | null;
   // True when the picked reference file exceeds the upload cap. The image still
   // previews (marked invalid) but Generate refuses to submit until replaced.
