@@ -1,3 +1,6 @@
+> [!WARNING]
+> This project is under active development. APIs, config shapes, and database schema may change between releases without notice — expect breaking changes until a stable release.
+
 <h3 align="center">Studio</h3>
 
 <p align="center">
