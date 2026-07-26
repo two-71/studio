@@ -3,6 +3,7 @@
 
 export { StudioBrand } from "./components/studio-brand";
 export { StudioShell } from "./components/studio-shell";
+export { StudioThemeSwitcher } from "./components/studio-theme-switcher";
 export type { AspectRatio, Resolution } from "./constants";
 export {
   ASPECT_RATIOS,
@@ -47,4 +48,12 @@ export {
 } from "./studio-config-provider";
 export type { StudioUser } from "./studio-user-context";
 export { useStudioUser } from "./studio-user-context";
+// UI primitives for hosts building controls that match the studio's styling
+// (e.g. a headerActions theme switcher).
+export { Button, buttonVariants } from "./ui/button";
+export {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 export { useMountEffect } from "./use-mount-effect";

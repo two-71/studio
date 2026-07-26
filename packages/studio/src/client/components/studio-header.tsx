@@ -80,12 +80,16 @@ export function StudioHeader() {
           ))}
         </div>
 
+        {config.headerActions}
+
         {/* No pill when billing is disabled or unlimited (null balance). */}
         {config.features.billing === false ||
         balance?.balance === null ? null : (
-          <div className="flex h-9 items-center gap-1 rounded-full bg-black/80 py-1 pr-1 pl-3 ring-1 ring-white/10">
-            <IconCoins className="size-5 text-pink-500" />
-            <span className="px-1.5 font-semibold text-sm text-white">
+          <div className="flex h-9 items-center gap-1 rounded-full bg-black/5 py-1 pr-1 pl-3 ring-1 ring-black/10 dark:bg-black/80 dark:ring-white/10">
+            {/* Follows the host's accent theme (same var as the accent
+                button variant); falls back to the stock pink. */}
+            <IconCoins className="size-5 text-[var(--studio-accent-from,oklch(0.656_0.241_354.308))]" />
+            <span className="px-1.5 font-semibold text-foreground text-sm dark:text-white">
               {balance ? balance.balance.toLocaleString() : "—"}
             </span>
             {config.topUpUrl ? (

@@ -27,6 +27,7 @@ export function Studio({
   onSignOut,
   loginUrl,
   brandIcon,
+  headerActions,
   notchWidth,
 }: {
   config: StudioClientConfig;
@@ -35,6 +36,7 @@ export function Studio({
   onSignOut?: StudioClientConfig["onSignOut"];
   loginUrl?: string;
   brandIcon?: StudioClientConfig["brandIcon"];
+  headerActions?: StudioClientConfig["headerActions"];
   notchWidth?: StudioClientConfig["notchWidth"];
 }) {
   const resolvedConfig: StudioClientConfig = {
@@ -43,6 +45,7 @@ export function Studio({
     onSignOut: onSignOut ?? config.onSignOut,
     loginUrl: loginUrl ?? config.loginUrl,
     brandIcon: brandIcon ?? config.brandIcon,
+    headerActions: headerActions ?? config.headerActions,
     notchWidth: notchWidth ?? config.notchWidth,
   };
   const [store] = useState(() => createStudioStore(resolvedConfig));

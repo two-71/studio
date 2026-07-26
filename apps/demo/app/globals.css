@@ -5,11 +5,17 @@
    classes its components use (responsive md:/lg: variants included). */
 @source "../../../packages/studio/src";
 
+/* Class-based dark mode (next-themes sets .dark/.light on <html>) — dark:
+   variants must follow the class, not the media query, so the manual theme
+   switcher can override the system setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* shadcn-style CSS variable tokens. Consumed both by this app's own login
    form and by the package's <Studio /> component tree
    (bg-sidebar/bg-popover/bg-accent/bg-secondary etc.).
 
-   Theme follows the system setting. Both palettes mirror the pink-tinted
+   Theme follows next-themes (system by default, manual override via the
+   header's StudioThemeSwitcher). Both palettes mirror the pink-tinted
    themes the package was designed against, hue-shifted to royal / Persian
    blue: every tinted token keeps its lightness/chroma but swaps hue
    ~320-350 (pink) for 262 (blue), and --studio-accent-* swaps the brand
@@ -44,30 +50,28 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: oklch(0.145 0.008 262);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.212 0.019 262);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.212 0.019 262);
-    --popover-foreground: oklch(0.985 0 0);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.542 0.034 262);
-    --primary: oklch(0.459 0.187 262);
-    --primary-foreground: oklch(0.971 0.014 262);
-    --secondary: oklch(0.274 0.006 262);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.263 0.024 262);
-    --muted-foreground: oklch(0.711 0.019 262);
-    --accent: oklch(0.459 0.187 262);
-    --accent-foreground: oklch(0.971 0.014 262);
-    --destructive: oklch(0.704 0.191 22.216);
-    --destructive-foreground: oklch(0.985 0 0);
-    --sidebar: oklch(0.212 0.019 262);
-    color-scheme: dark;
-  }
+.dark {
+  --background: oklch(0.145 0.008 262);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.212 0.019 262);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.212 0.019 262);
+  --popover-foreground: oklch(0.985 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.542 0.034 262);
+  --primary: oklch(0.459 0.187 262);
+  --primary-foreground: oklch(0.971 0.014 262);
+  --secondary: oklch(0.274 0.006 262);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.263 0.024 262);
+  --muted-foreground: oklch(0.711 0.019 262);
+  --accent: oklch(0.459 0.187 262);
+  --accent-foreground: oklch(0.971 0.014 262);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.212 0.019 262);
+  color-scheme: dark;
 }
 
 @theme inline {

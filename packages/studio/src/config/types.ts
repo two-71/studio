@@ -303,6 +303,9 @@ export interface StudioClientConfig {
   loginUrl?: string;
   // Brand tile icon (StudioBrand). Default is an image-generation glyph.
   brandIcon?: ReactNode;
+  // Extra header controls (StudioHeader), rendered left of the coin pill —
+  // e.g. a theme switcher.
+  headerActions?: ReactNode;
   // Width in px of the decorative top-right notch (StudioNotch, lg+ only).
   // Default 290 — widen it when the header hosts more controls.
   notchWidth?: number;
