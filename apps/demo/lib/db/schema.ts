@@ -1,5 +1,5 @@
 // Better-auth's tables (auto-shaped to match its Drizzle adapter's expected
-// column names) plus the package's generation table fragment (spec §7),
+// column names) plus the package's generation table fragment,
 // spread in via createGenerationTable's factory so its userId FK points at
 // this app's own `user` table.
 

@@ -1,8 +1,8 @@
-// Demo StudioConfig (spec §3.1, §9.2, §10 B1.2): guest billing, open
+// Demo StudioConfig: guest billing, open
 // moderation, one SFW Krea 2 image model (with style loras + identity-edit
 // reference support) and an LTX 2.3 image-to-video model, no prompts
-// (enhance/title off — both fall back to their documented defaults per
-// spec §4.4), no watermark spec, no notify hook.
+// (enhance/title off — both fall back to the package defaults), no
+// watermark spec, no notify hook.
 //
 // No "server-only" import guard, matching the package's own handlers.ts: the
 // same config module is imported by both Next route handlers and
@@ -44,8 +44,8 @@ function requireEnv(name: string): string {
   return value;
 }
 
-// Account mode: AuthAdapter wraps better-auth's session lookup (spec §4.5 —
-// the package never bundles better-auth itself). `req.headers` carries the
+// Account mode: AuthAdapter wraps better-auth's session lookup (the package
+// never bundles better-auth itself). `req.headers` carries the
 // session cookie the same way a Server Component's `headers()` would.
 // const authAdapter: AuthAdapter = {
 //   async getSession(req) {
@@ -190,8 +190,8 @@ export const studioConfig: StudioConfig = {
   branding: {
     siteName: "2.71",
   },
-  // The package's DbClient type is intentionally unparameterized (spec §7 —
-  // see config/types.ts's DbClient comment); a host's own (larger-schema)
+  // The package's DbClient type is intentionally unparameterized (see
+  // config/types.ts's DbClient comment); a host's own (larger-schema)
   // instance is narrowed down through `unknown` rather than `any`.
   db: db as unknown as DbClient,
 };

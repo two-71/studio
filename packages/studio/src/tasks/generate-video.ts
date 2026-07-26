@@ -3,7 +3,7 @@
 // fan-out). Owns one RunPod job end to end, mirroring generate-image: submit
 // (webhook-armed) -> wait for the webhook or timeout -> re-read the
 // authoritative status -> upload the mp4 -> persist. Moved from
-// trigger/generate-video.ts (spec §10 A2.3).
+// trigger/generate-video.ts.
 //
 // maxAttempts is pinned to 1 for the same reason as generate-image: a retry
 // would resubmit a fresh RunPod job (new job id, new spend) on top of one that

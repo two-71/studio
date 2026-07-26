@@ -1,5 +1,5 @@
 // RunPod ComfyUI serverless client for the generate-* tasks. Rewritten from
-// the host app's RunPod client (spec §10 A2): instead of resolving a workflow via
+// the host app's RunPod client: instead of resolving a workflow via
 // a host model registry (getModelRuntime), every call takes the exact
 // WorkflowSpec + RunpodConfig it needs, already resolved by the caller from
 // `config.models`/`config.video` — package code never owns a model registry.

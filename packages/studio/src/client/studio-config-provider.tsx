@@ -1,6 +1,6 @@
 "use client";
 
-// Client-side access to the StudioClientConfig (spec §4.7): client components
+// Client-side access to the StudioClientConfig: client components
 // read cost/balance/branding/feature-flag data from here instead of
 // importing host-specific model/catalog constants directly. Wired by
 // <Studio> (./studio.tsx), which the host renders with the server-derived

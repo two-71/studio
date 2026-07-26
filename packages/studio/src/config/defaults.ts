@@ -1,4 +1,4 @@
-// Open-package defaults for the two provider interfaces (spec §4.2, §4.3).
+// Open-package defaults for the two provider interfaces.
 
 import type { BillingProvider, ModerationProvider } from "./types";
 

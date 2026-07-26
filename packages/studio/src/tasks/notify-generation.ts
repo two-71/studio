@@ -1,7 +1,7 @@
 // Fire-and-forget sidecar to "generate-image" / "generate-video": runs
 // config.notify off the critical path, so the parent run — which the UI
 // watches for completion — never waits on it. Moved from
-// trigger/notify-generation.ts (spec §10 A2.3).
+// trigger/notify-generation.ts.
 
 import { schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";

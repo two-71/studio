@@ -2,7 +2,7 @@
 // factories: terminal-state detection, metrics shaping, the webhook-lag
 // re-poll, and the race-safe fail+refund path. Only ever called from task
 // run bodies (uses the task-scoped logger/metadata/wait). Moved from
-// trigger/runpod-status.ts (spec §10 A2.3) as an internal package module —
+// trigger/runpod-status.ts as an internal package module —
 // not part of the "./tasks" public entry point.
 
 import { logger, metadata, wait } from "@trigger.dev/sdk";

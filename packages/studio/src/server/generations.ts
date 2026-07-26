@@ -1,4 +1,4 @@
-// Route-facing generation queries for createStudioHandlers (spec §5, §7).
+// Route-facing generation queries for createStudioHandlers.
 // Extracted from the host app's generation queries module (the pipeline-facing
 // half of that file — attachRunpodJob/markCompleted/markFailed/etc. — stays
 // host side; it's only ever called from trigger tasks, which are out of scope
@@ -12,7 +12,7 @@ import type { RunpodConfig, StudioConfig } from "../config/types";
 import { createGenerationTable } from "../schema/generation";
 
 // The host's real `generation` table already carries a FK to its own `user`
-// table (built from this same factory, spec §7). This package-local copy is
+// table (built from this same factory). This package-local copy is
 // only ever used for query building (select/insert/update against
 // `config.db`), never for migrations, so the FK target just needs to satisfy
 // the factory's type signature — drizzle only dereferences `.references()`
@@ -44,9 +44,9 @@ export interface CreateGenerationInput {
 }
 
 // Inserts the batch in one round trip; rows come back in input order. Fires
-// "created" once per batch through the notify hook (spec §7's "fold
-// funnelEvent into notify" — the package can't record a host's attribution
-// event itself, so the host's notify() implementation does).
+// "created" once per batch through the notify hook (the package can't
+// record a host's attribution event itself, so the host's notify()
+// implementation does).
 async function createGenerations(
   config: StudioConfig,
   inputs: CreateGenerationInput[]

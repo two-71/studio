@@ -1,6 +1,6 @@
 "use client";
 
-// Client-side access to the signed-in user (spec §4.7: the serializable data
+// Client-side access to the signed-in user (the serializable data
 // that crosses the server/client boundary alongside StudioClientConfig).
 // Provided once by <Studio> and read via useStudioUser() wherever it's
 // needed (today: the header's avatar/name/email), avoiding prop drilling

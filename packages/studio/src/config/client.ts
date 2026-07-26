@@ -1,5 +1,5 @@
 // Derives the serializable StudioClientConfig from a server StudioConfig
-// (spec §4.7): strips workflow graphs/node maps and every provider/secret,
+//: strips workflow graphs/node maps and every provider/secret,
 // keeping only what the <Studio /> client tree needs to render.
 
 import type {

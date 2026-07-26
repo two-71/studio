@@ -1,6 +1,6 @@
 "use client";
 
-// Studio controls + lightbox UI state (plan §7). A module-level singleton
+// Studio controls + lightbox UI state. A module-level singleton
 // can't be package-pure — its initial selection and persisted-value
 // revalidation both need the host's model/lora/pose catalog, which only
 // exists once <Studio> has a StudioClientConfig. So this is a factory

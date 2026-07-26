@@ -2,7 +2,7 @@
 // gallery title from the user's typed prompt and stamps it on the request's
 // rows whenever it's ready. Nothing waits on the generated title — a slow or
 // failed title never delays or fails the generation pipeline. Moved from
-// trigger/generate-title.ts (spec §10 A2.3).
+// trigger/generate-title.ts.
 
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
@@ -21,7 +21,7 @@ export type GenerateTitlePayload = z.infer<typeof generateTitlePayloadSchema>;
 const EXCERPT_WORD_COUNT = 4;
 const WHITESPACE_RE = /\s+/;
 
-// Spec §4.4 fallback when promptRunner.title isn't configured: a short
+// Fallback when promptRunner.title isn't configured: a short
 // excerpt of the typed prompt instead of an LLM call.
 function excerptTitle(prompt: string): string {
   return prompt

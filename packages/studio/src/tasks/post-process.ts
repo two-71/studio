@@ -1,5 +1,5 @@
 // Turns RunPod's raw base64 output images into published storage URLs.
-// Moved from the host app's post-process module (spec §10 A2.3): uploads go
+// Moved from the host app's post-process module: uploads go
 // through `config.storage` instead of a direct R2 caller. Both the watermark
 // and PNG-metadata steps are the package's own server-side helpers (already
 // generic, moved in the A2 mechanical reorg).

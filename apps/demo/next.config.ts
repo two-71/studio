@@ -9,9 +9,8 @@ const nextConfig: NextConfig = {
     // The package's gallery thumbnails request quality 60.
     qualities: [60, 75],
   },
-  // The package ships TypeScript source (spec §3.1's "ship source, no build
-  // step" decision) — Next transpiles it like the rest of the app instead of
-  // consuming a prebuilt dist.
+  // The package ships TypeScript source (no build step) — Next transpiles it
+  // like the rest of the app instead of consuming a prebuilt dist.
   transpilePackages: ["@two-71/studio"],
   // @resvg/resvg-js (used internally by the package's watermark step) is a
   // native module — it must load from node_modules at runtime, not be

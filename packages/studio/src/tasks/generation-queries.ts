@@ -1,7 +1,7 @@
 // Pipeline-facing generation queries: attach/complete/fail/queue/title,
 // called only by the background tasks in this directory. This is the
 // tasks-side twin of ../server/generations.ts's route-facing queries — same
-// package-local generation-table technique (spec §7: the FK target only
+// package-local generation-table technique (the FK target only
 // needs to satisfy createGenerationTable's type signature for query
 // building, never for migrations), kept as its own copy because these
 // queries are pipeline-only and the two entry points ("./server", "./tasks")

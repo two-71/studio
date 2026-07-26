@@ -1,4 +1,4 @@
-// Assembles the five Studio background tasks (spec §6, §10 A2.3) from one
+// Assembles the five Studio background tasks from one
 // StudioConfig. Each task factory calls schemaTask() itself (task ids and
 // payload schemas are defined next to their run body), so this function's
 // only job is wiring the shared query layer and the cross-task handles

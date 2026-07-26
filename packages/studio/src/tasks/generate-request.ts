@@ -3,7 +3,7 @@
 // "generate-image" child out per requested model/row. Each child owns its
 // own RunPod job, coin spend, and terminal write independently — this task's
 // only job is the shared prompt work and the fan-out. Moved from
-// trigger/generate-request.ts (spec §10 A2.3).
+// trigger/generate-request.ts.
 
 import { logger, metadata, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
@@ -156,7 +156,7 @@ export function createGenerateRequestTask(
     if (moderated.action === "block") {
       logger.warn("prompt blocked by moderation", { prompt: payload.prompt });
       metadata.set("step", "failed").set("failReason", "content_policy");
-      // Block audit is the moderation provider's responsibility (spec §4.3),
+      // Block audit is the moderation provider's responsibility,
       // so this task doesn't record it directly.
       await queries.markManyFailed(payload.userId, ids, "content_policy");
       return;

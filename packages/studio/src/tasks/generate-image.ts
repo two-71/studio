@@ -2,7 +2,7 @@
 // end to end: submit (webhook-armed) -> wait for the webhook or a 10m timeout
 // -> re-read the authoritative status from RunPod either way (the webhook
 // body itself is never trusted) -> post-process -> persist. Moved from
-// trigger/generate-image.ts (spec §10 A2.3).
+// trigger/generate-image.ts.
 //
 // maxAttempts is pinned to 1: a Trigger.dev-driven retry would resubmit a
 // fresh RunPod job (new job id, new spend) on top of one that may still be

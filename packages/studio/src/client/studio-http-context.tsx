@@ -1,6 +1,6 @@
 "use client";
 
-// Client-side HTTP boundary (spec §5's route mount, plan §5): package code
+// Client-side HTTP boundary: package code
 // can't assume a host mounts createStudioHandlers at any particular path, so
 // the ky instance is built once by <Studio> from config.apiBasePath (default
 // "/api/studio") and provided here instead of a module-level singleton.

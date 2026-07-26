@@ -1,4 +1,4 @@
-// createStudioHandlers (spec §5): the four route bodies from
+// createStudioHandlers: the four route bodies from
 // app/api/{generate/run,generate/video,generations,balance}/route.ts,
 // rewritten as closures over `config` and mounted by the host behind one
 // catch-all (app/api/studio/[...studio]/route.ts). Response shapes are
@@ -24,7 +24,7 @@ import {
 } from "./generations";
 
 // Generic bookkeeping constants, not model/workflow data — kept as package
-// literals rather than a config surface (not listed in spec §4).
+// literals rather than a config surface.
 const MAX_SEED = 1_125_899_906_842_624;
 const MAX_CONTROL_IMAGE_BYTES = 7 * 1024 * 1024;
 // The shared byte cap compared against base64 length (4 chars per 3 bytes).
@@ -49,9 +49,9 @@ function routePath(req: Request): string {
 
 function buildGenerateRunSchema(config: StudioConfig) {
   const modelIds = new Set(config.models.map((model) => model.id));
-  // posePreset stores the pose's controlImageUrl (today a /public path,
-  // spec §13 flag — the client sends the same value it renders as the
-  // thumbnail/control image, not the PoseSpec id).
+  // posePreset stores the pose's controlImageUrl (today a /public path —
+  // the client sends the same value it renders as the thumbnail/control
+  // image, not the PoseSpec id).
   const posePaths = new Set(
     config.models
       .flatMap((model) => model.poses ?? [])
@@ -205,7 +205,7 @@ async function handleGenerateRun(
   };
 
   // Triggered by task id string, not a task import — avoids a handler↔task
-  // import cycle (spec §6) and keeps this package's "./server" entry free of
+  // import cycle and keeps this package's "./server" entry free of
   // "./tasks" imports.
   await tasks.trigger("generate-request", payload, { tags: [tag] });
 

@@ -1,4 +1,4 @@
-// Drizzle table fragment for the `generation` table (spec §7). The host owns
+// Drizzle table fragment for the `generation` table. The host owns
 // its own `user` table (auth), so this is a factory rather than a bare
 // `pgTable` export: the host passes a thunk resolving to its user table's
 // `id` column, keeping the FK (and thus `drizzle-kit generate`'s diff)

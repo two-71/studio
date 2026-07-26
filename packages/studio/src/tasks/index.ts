@@ -1,4 +1,4 @@
-// biome-ignore-all lint/performance/noBarrelFile: this is the package's "/tasks" entry point (spec §3.1 exports map)
+// biome-ignore-all lint/performance/noBarrelFile: this is the package's "/tasks" entry point
 export { createStudioTasks, type StudioTasks } from "./create-studio-tasks";
 export {
   type GenerateImagePayload,

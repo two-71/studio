@@ -1,4 +1,4 @@
-// StudioConfig contracts (spec §4, docs/open-source-studio-spec.md). Written
+// StudioConfig contracts. Written
 // as future package code: no imports from host-app-specific modules (lib/db,
 // lib/billing, lib/ai, better-auth, …) — only generic types and small
 // standard-library-shaped values.
@@ -6,7 +6,7 @@
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { ReactNode } from "react";
 
-// --- Models & workflows (§4.1) ---------------------------------------------
+// --- Models & workflows ----------------------------------------------------
 
 export const RATIO_KEYS = [
   "1:1",
@@ -83,9 +83,8 @@ export interface StudioModel {
 }
 
 export interface VideoModelSpec {
-  // Spec gap (§13 flag 9): the literal §4.1 interface has no id, but the
-  // video route needs a model id string for RunpodConfig.endpoints and
-  // createGenerations' modelId.
+  // The video route needs a model id string for RunpodConfig.endpoints
+  // and createGenerations' modelId.
   id: string;
   workflow: WorkflowSpec;
   durations: number[]; // allowed seconds
@@ -100,7 +99,7 @@ export interface RunpodConfig {
   endpoints: Record<string, string>; // modelId (and video model id) → RunPod endpoint id
 }
 
-// --- Billing (§4.2) ---------------------------------------------------------
+// --- Billing ----------------------------------------------------------------
 
 export interface BillingProvider {
   costFor(modelId: string): number;
@@ -119,7 +118,7 @@ export interface BillingProvider {
   disabled?: boolean;
 }
 
-// --- Moderation (§4.3) ------------------------------------------------------
+// --- Moderation -------------------------------------------------------------
 
 export type ModerationResult =
   | { action: "allow"; rewritten?: string }
@@ -129,7 +128,7 @@ export interface ModerationProvider {
   check(input: { prompt: string; userId: string }): Promise<ModerationResult>;
 }
 
-// --- Prompts (§4.4) ----------------------------------------------------------
+// --- Prompts -----------------------------------------------------------------
 
 export interface PromptSpec {
   system: string;
@@ -153,16 +152,14 @@ export interface EnhanceContext {
 // host uses — it was never actually wired to an invocation (see
 // studio.config.ts's prompts comment). The pipeline needs something it can
 // call, so a host supplies the actual function here; the package has no
-// generic caller of its own yet (spec §4.4's "thin OpenAI-compatible
-// generateText" fallback is not implemented in A2 — open item). Absent
-// entries mirror §4.4's documented fallbacks: no enhance call (original
-// prompt passes through), title falls back to a prompt excerpt.
+// generic caller of its own. Absent entries fall back: no enhance call
+// (original prompt passes through), title falls back to a prompt excerpt.
 export interface PromptRunner {
   enhance?: (prompt: string, context: EnhanceContext) => Promise<string>;
   title?: (prompt: string) => Promise<string | null>;
 }
 
-// --- Storage & auth (§4.5) --------------------------------------------------
+// --- Storage & auth ---------------------------------------------------------
 
 export interface StorageAdapter {
   upload(key: string, body: Uint8Array, contentType: string): Promise<void>;
@@ -175,7 +172,7 @@ export interface AuthAdapter {
   getSession(req: Request): Promise<{ userId: string } | null>;
 }
 
-// --- Cross-cutting hooks (§4.6) ---------------------------------------------
+// --- Cross-cutting hooks ----------------------------------------------------
 
 export interface WatermarkSpec {
   svgBadge?: string;
@@ -188,8 +185,7 @@ export interface BrandingLink {
   url: string;
 }
 
-// Not fully specified in the spec (only implied by §8: "site name, logo
-// slot, links array") — originated here.
+// Header branding: site name, logo slot, links array.
 export interface BrandingSpec {
   siteName?: string;
   logoUrl?: string;
@@ -212,21 +208,19 @@ export interface GenerationSummary {
 }
 
 // "created" fires once per insert batch, right after createGenerations
-// returns (spec §7's "fold funnelEvent into notify" lean, taken in A2: the
-// package can't call a host's attribution module directly, so the route
-// reports the milestone through this hook instead — a host's notify()
-// implementation is what actually records it).
+// returns (the package can't call a host's attribution module directly, so
+// the route reports the milestone through this hook instead — a host's
+// notify() implementation is what actually records it).
 export type GenerationEvent =
   | { type: "created"; userId: string; generationId: string }
   | { type: "completed"; generation: GenerationSummary }
   | { type: "failed"; generation: GenerationSummary; reason: string }
   | { type: "moderation-blocked"; userId: string; prompt: string };
 
-// --- Database (§7) ----------------------------------------------------------
+// --- Database ---------------------------------------------------------------
 
-// The host's Drizzle database instance (spec §7: "pass `db` in config").
-// This targets the `drizzle-orm/node-postgres` driver (the spec's
-// `PostgresJsDatabase` prose is imprecise — code follows the real driver).
+// The host's Drizzle database instance, targeting the
+// `drizzle-orm/node-postgres` driver.
 // Unparameterized (defaults to `Record<string, never>`): package queries only
 // ever pass their own table objects to `.insert()`/`.select()`/`.update()`,
 // which don't depend on the schema generic — only the `.query.*` relational
@@ -235,7 +229,7 @@ export type GenerationEvent =
 // own (larger-schema) instance down with `as unknown as DbClient`.
 export type DbClient = NodePgDatabase;
 
-// --- Top-level config (§4 opening) ------------------------------------------
+// --- Top-level config -------------------------------------------------------
 
 export interface StudioConfig {
   models: StudioModel[];
@@ -250,10 +244,10 @@ export interface StudioConfig {
   watermark?: WatermarkSpec; // omit = no watermark
   branding?: BrandingSpec;
   notify?: (event: GenerationEvent) => Promise<void>; // omit = no notifications
-  db: DbClient; // §7: host's Drizzle instance, decided to live in config
+  db: DbClient; // host's Drizzle instance
 }
 
-// --- Client/server split (§4.7) ---------------------------------------------
+// --- Client/server split ----------------------------------------------------
 
 // StudioModel minus the workflow graph/node map — the only field that must
 // never reach the client. `coinCost` is derived (not part of the server

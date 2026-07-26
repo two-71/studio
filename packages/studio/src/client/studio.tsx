@@ -1,6 +1,6 @@
 "use client";
 
-// The <Studio /> root (spec §3.1 + §4.7 + §10 A2.2). Host apps render this
+// The <Studio /> root. Host apps render this
 // once, passing the serializable StudioClientConfig (derived server-side via
 // deriveClientConfig — never the full StudioConfig with secrets/workflow
 // graphs) and the signed-in user. <Studio> owns the full component tree

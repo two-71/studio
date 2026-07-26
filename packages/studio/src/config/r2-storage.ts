@@ -1,4 +1,4 @@
-// Default StorageAdapter (spec §4.5) for any S3-compatible store, extracted
+// Default StorageAdapter for any S3-compatible store, extracted
 // from lib/r2.ts's logic. Takes credentials as arguments instead of reading
 // process.env directly, so it stays host-agnostic; lib/r2.ts itself is left
 // untouched for A1 — the host app keeps calling it directly until a later

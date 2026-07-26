@@ -1,4 +1,4 @@
-// Formats a host's coin display name for a given context (plan §8 item 4).
+// Formats a host's coin display name for a given context.
 // `StudioClientConfig.coinName` is already the plural display label (e.g.
 // "coins", set from `billing.coinName`) — the singular is derived by
 // stripping a trailing "s", which covers the common case without the host

@@ -24,7 +24,7 @@ export default async function StudioPage() {
   await ensureGuestUser(guest);
 
   // deriveClientConfig strips workflow graphs and every provider/secret
-  // (spec §4.7) — this projection, not the full StudioConfig, is what's
+  // — this projection, not the full StudioConfig, is what's
   // allowed to cross into the client tree.
   const clientConfig = deriveClientConfig(studioConfig);
 

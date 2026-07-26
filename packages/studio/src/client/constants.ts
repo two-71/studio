@@ -1,5 +1,5 @@
-// Generic display constants sliced out of the host app's catalog module (plan
-// §1): aspect ratios, resolution tiers, and the control-image upload cap
+// Generic display constants sliced out of the host app's catalog module:
+// aspect ratios, resolution tiers, and the control-image upload cap
 // apply to any host, unlike the model/LoRA/pose catalog itself (which stays
 // host-side and is threaded through StudioClientConfig instead).
 
