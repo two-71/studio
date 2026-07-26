@@ -1,4 +1,25 @@
-# @two-71/studio
+<h3 align="center">Studio</h3>
+
+<p align="center">
+    Open-source AI image &amp; video generation studio for Next.js.
+    <br />
+    <a href="https://studio.271.dev"><strong>Try the demo »</strong></a>
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/@two-71/studio">
+    <img src="https://img.shields.io/npm/v/%40two-71%2Fstudio?logo=npm&color=cb3837&logoColor=fff" alt="npm version" />
+  </a>
+  <a href="https://github.com/two-71/studio/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license" />
+  </a>
+</p>
+
+<a href="https://studio.271.dev">
+  <img alt="Studio — open-source AI image and video generation studio for Next.js" src="https://raw.githubusercontent.com/two-71/studio/main/.github/hero.png">
+</a>
+
+## Introduction
 
 An installable AI image/video generation surface for Next.js: a config-driven pipeline (RunPod/ComfyUI generation, Trigger.dev background tasks, Drizzle persistence) plus a `<Studio />` client shell. You supply the providers — auth, billing, moderation, storage — and the workflow JSON for your models; the package handles the rest.
 
