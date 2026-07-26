@@ -19,8 +19,10 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:focus-visible:ring-destructive/40 dark:hover:bg-destructive/30",
         // Brand gradient pill (studio "Buy", Pay Now, age-gate CTAs).
+        // Themeable via --studio-accent-from/-to/-highlight; falls back to
+        // the same pink as the generate button and brand mark.
         accent:
-          "rounded-full bg-linear-to-b from-pink-400 to-pink-500 font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35)] hover:to-pink-500/90",
+          "rounded-full bg-[linear-gradient(to_bottom,var(--studio-accent-from,oklch(0.75_0.18_350)),var(--studio-accent-to,oklch(0.65_0.24_0)))] font-semibold text-white shadow-[inset_0_1px_0_var(--studio-accent-highlight,rgba(255,255,255,0.35))] transition-[filter] hover:brightness-95",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

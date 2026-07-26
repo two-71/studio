@@ -5,57 +5,41 @@
    classes its components use (responsive md:/lg: variants included). */
 @source "../../../packages/studio/src";
 
-/* shadcn-style CSS variable tokens, theme-aware. Consumed both by this app's
-   own login form and by the package's moved <Studio /> component tree
-   (bg-sidebar/bg-popover/bg-accent/bg-secondary etc.), so this set covers
-   every token those components reference. */
-:root {
-  --background: 0 0% 100%;
-  --foreground: 240 10% 3.9%;
-  --card: 0 0% 100%;
-  --card-foreground: 240 10% 3.9%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 3.9%;
-  --border: 240 5.9% 90%;
-  --input: 240 5.9% 90%;
-  --ring: 240 5.9% 10%;
-  --primary: 240 5.9% 10%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 240 4.8% 95.9%;
-  --secondary-foreground: 240 5.9% 10%;
-  --muted: 240 4.8% 95.9%;
-  --muted-foreground: 240 3.8% 46.1%;
-  --accent: 240 4.8% 95.9%;
-  --accent-foreground: 240 5.9% 10%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 98%;
-  --sidebar: 240 4.8% 97.9%;
-  --radius: 0.5rem;
-}
+/* shadcn-style CSS variable tokens. Consumed both by this app's own login
+   form and by the package's <Studio /> component tree
+   (bg-sidebar/bg-popover/bg-accent/bg-secondary etc.).
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 5.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 5.9%;
-    --popover-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 240 4.9% 83.9%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62% 45%;
-    --destructive-foreground: 0 0% 98%;
-    --sidebar: 240 10% 2.9%;
-  }
+   The demo is dark-only, themed royal blue: navy-tinted neutrals plus a
+   Persian-blue accent gradient (--studio-accent-*) replacing the package's
+   default pink. */
+:root {
+  --background: 230 22% 5%;
+  --foreground: 220 14% 96%;
+  --card: 230 20% 8%;
+  --card-foreground: 220 14% 96%;
+  --popover: 230 20% 8%;
+  --popover-foreground: 220 14% 96%;
+  --border: 230 15% 16%;
+  --input: 230 15% 16%;
+  --ring: 227 70% 58%;
+  --primary: 227 68% 54%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 230 15% 16%;
+  --secondary-foreground: 220 14% 96%;
+  --muted: 230 15% 16%;
+  --muted-foreground: 228 10% 64%;
+  --accent: 230 15% 16%;
+  --accent-foreground: 220 14% 96%;
+  --destructive: 0 62% 45%;
+  --destructive-foreground: 0 0% 98%;
+  --sidebar: 231 26% 4%;
+  --radius: 0.5rem;
+
+  /* Studio brand gradient — royal / Persian blue. */
+  --studio-accent-from: oklch(0.58 0.19 262);
+  --studio-accent-to: oklch(0.47 0.24 266);
+  --studio-accent-highlight: rgba(255, 255, 255, 0.3);
+  color-scheme: dark;
 }
 
 @theme inline {
