@@ -1,4 +1,6 @@
-<!-- screenshot -->
+<a href="https://studio.271.dev">
+  <img alt="Studio — open-source AI image and video generation studio for Next.js" src="./.github/hero.png">
+</a>
 
 <h3 align="center">Studio</h3>
 
