@@ -203,7 +203,7 @@ export function ResultCard({ result, onOpen, priority }: ResultCardProps) {
   const blocked = failed && result.errorCode === "content_policy";
   const hasImage = !(pending || failed);
   const deleting = usePendingDeleteIds().has(result.id);
-  const { imageLoader } = useStudioConfig();
+  const { imageLoader, features } = useStudioConfig();
 
   return (
     <div
@@ -283,11 +283,13 @@ export function ResultCard({ result, onOpen, priority }: ResultCardProps) {
                   <IconClock className="size-3.5" />
                   {result.time}
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="font-semibold text-emerald-400">$</span>
-                  {result.coins}
-                  <IconCoins className="size-3.5" />
-                </span>
+                {features.billing && (
+                  <span className="flex items-center gap-1.5">
+                    <span className="font-semibold text-emerald-400">$</span>
+                    {result.coins}
+                    <IconCoins className="size-3.5" />
+                  </span>
+                )}
               </>
             )}
           </div>

@@ -26,6 +26,7 @@ export function deriveClientConfig(config: StudioConfig): StudioClientConfig {
       video: Boolean(config.video),
       loras: models.some((model) => (model.loras?.length ?? 0) > 0),
       poses: models.some((model) => (model.poses?.length ?? 0) > 0),
+      billing: !config.billing.disabled,
     },
     video: config.video
       ? {

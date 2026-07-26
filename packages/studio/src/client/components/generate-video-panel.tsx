@@ -100,7 +100,7 @@ export function GenerateVideoPanel({ result }: { result: StudioResult }) {
         ))}
       </div>
       <div className="flex items-center justify-between gap-2">
-        {config.video ? (
+        {config.video && config.features.billing ? (
           <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
             <span className="font-semibold text-emerald-400">$</span>
             {Math.round(duration * config.video.coinsPerSecond)}

@@ -19,6 +19,9 @@ export function StudioClient({
     <Studio
       config={config}
       loginUrl="/login"
+      // Demo header only holds the avatar — the default 290px notch leaves a
+      // long empty shelf.
+      notchWidth={140}
       onSignOut={async () => {
         await signOut();
       }}

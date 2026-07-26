@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Allow next/image to serve generated media from the storage bucket.
+  images: {
+    remotePatterns: process.env.R2_PUBLIC_URL
+      ? [{ hostname: new URL(process.env.R2_PUBLIC_URL).hostname }]
+      : [],
+    // The package's gallery thumbnails request quality 60.
+    qualities: [60, 75],
+  },
   // The package ships TypeScript source (spec §3.1's "ship source, no build
   // step" decision) — Next transpiles it like the rest of the app instead of
   // consuming a prebuilt dist.

@@ -4,7 +4,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Studio Demo",
+  title: "2.71 Studio",
   description: "Reference app for @two-71/studio",
 };
 

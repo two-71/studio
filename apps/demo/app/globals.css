@@ -9,66 +9,94 @@
    form and by the package's <Studio /> component tree
    (bg-sidebar/bg-popover/bg-accent/bg-secondary etc.).
 
-   The demo is dark-only, themed royal blue: navy-tinted neutrals plus a
-   Persian-blue accent gradient (--studio-accent-*) replacing the package's
-   default pink. */
+   Theme follows the system setting. Both palettes mirror the pink-tinted
+   themes the package was designed against, hue-shifted to royal / Persian
+   blue: every tinted token keeps its lightness/chroma but swaps hue
+   ~320-350 (pink) for 262 (blue), and --studio-accent-* swaps the brand
+   gradient to blue. */
 :root {
-  --background: 230 22% 5%;
-  --foreground: 220 14% 96%;
-  --card: 230 20% 8%;
-  --card-foreground: 220 14% 96%;
-  --popover: 230 20% 8%;
-  --popover-foreground: 220 14% 96%;
-  --border: 230 15% 16%;
-  --input: 230 15% 16%;
-  --ring: 227 70% 58%;
-  --primary: 227 68% 54%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 230 15% 16%;
-  --secondary-foreground: 220 14% 96%;
-  --muted: 230 15% 16%;
-  --muted-foreground: 228 10% 64%;
-  --accent: 230 15% 16%;
-  --accent-foreground: 220 14% 96%;
-  --destructive: 0 62% 45%;
-  --destructive-foreground: 0 0% 98%;
-  --sidebar: 231 26% 4%;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0.008 262);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0.008 262);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0.008 262);
+  --border: oklch(0.922 0.005 262);
+  --input: oklch(0.922 0.005 262);
+  --ring: oklch(0.711 0.019 262);
+  --primary: oklch(0.525 0.223 262);
+  --primary-foreground: oklch(0.971 0.014 262);
+  --secondary: oklch(0.967 0.001 262);
+  --secondary-foreground: oklch(0.21 0.006 262);
+  --muted: oklch(0.96 0.003 262);
+  --muted-foreground: oklch(0.542 0.034 262);
+  --accent: oklch(0.525 0.223 262);
+  --accent-foreground: oklch(0.971 0.014 262);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.985 0 0);
   --radius: 0.5rem;
 
-  /* Studio brand gradient — royal / Persian blue. */
-  --studio-accent-from: oklch(0.58 0.19 262);
-  --studio-accent-to: oklch(0.47 0.24 266);
-  --studio-accent-highlight: rgba(255, 255, 255, 0.3);
-  color-scheme: dark;
+  /* Studio brand gradient — royal / Persian blue (both themes). */
+  --studio-accent-from: oklch(0.62 0.17 262);
+  --studio-accent-to: oklch(0.51 0.23 265);
+  --studio-accent-highlight: rgba(255, 255, 255, 0.35);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.145 0.008 262);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.212 0.019 262);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.212 0.019 262);
+    --popover-foreground: oklch(0.985 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.542 0.034 262);
+    --primary: oklch(0.459 0.187 262);
+    --primary-foreground: oklch(0.971 0.014 262);
+    --secondary: oklch(0.274 0.006 262);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.263 0.024 262);
+    --muted-foreground: oklch(0.711 0.019 262);
+    --accent: oklch(0.459 0.187 262);
+    --accent-foreground: oklch(0.971 0.014 262);
+    --destructive: oklch(0.704 0.191 22.216);
+    --destructive-foreground: oklch(0.985 0 0);
+    --sidebar: oklch(0.212 0.019 262);
+    color-scheme: dark;
+  }
 }
 
 @theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-sidebar: hsl(var(--sidebar));
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-sidebar: var(--sidebar);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 }
 
 body {
-  color: hsl(var(--foreground));
-  background-color: hsl(var(--background));
+  color: var(--foreground);
+  background-color: var(--background);
 }

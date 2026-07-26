@@ -79,7 +79,7 @@ export const studioConfig: StudioConfig = {
   billing: freeBilling,
   moderation: allowAllModeration,
   branding: {
-    siteName: "Studio Demo",
+    siteName: "2.71",
   },
   // The package's DbClient type is intentionally unparameterized (spec §7 —
   // see config/types.ts's DbClient comment); a host's own (larger-schema)

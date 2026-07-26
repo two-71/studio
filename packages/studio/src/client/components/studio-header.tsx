@@ -80,8 +80,9 @@ export function StudioHeader() {
           ))}
         </div>
 
-        {/* null balance = unlimited billing (free demo) — no coin pill at all */}
-        {balance?.balance === null ? null : (
+        {/* No pill when billing is disabled or unlimited (null balance). */}
+        {config.features.billing === false ||
+        balance?.balance === null ? null : (
           <div className="flex h-9 items-center gap-1 rounded-full bg-black/80 py-1 pr-1 pl-3 ring-1 ring-white/10">
             <IconCoins className="size-5 text-pink-500" />
             <span className="px-1.5 font-semibold text-sm text-white">

@@ -500,11 +500,13 @@ function InfoDetails({ result }: { result: StudioResult }) {
           <IconClock className="size-3.5" />
           {isDone(result) ? result.time : "—"}
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className="font-semibold text-emerald-400">$</span>
-          {result.coins || "—"}
-          <IconCoins className="size-3.5" />
-        </span>
+        {config.features.billing && (
+          <span className="flex items-center gap-1.5">
+            <span className="font-semibold text-emerald-400">$</span>
+            {result.coins || "—"}
+            <IconCoins className="size-3.5" />
+          </span>
+        )}
         <Badge variant="secondary">{result.ratio}</Badge>
         <Badge variant="secondary">{result.resolution}</Badge>
         {result.durationSeconds !== undefined && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { IconFlameFilled } from "@tabler/icons-react";
+import { IconImageGeneration } from "@tabler/icons-react";
 import { useStudioConfig } from "../studio-config-provider";
 
 // Accent gradient tile (falls back to the same colors as the package's
@@ -17,7 +17,7 @@ export function StudioBrand() {
       <div
         className={`${ACCENT_GLOW_CLASS} flex aspect-square size-8 items-center justify-center rounded-lg`}
       >
-        <IconFlameFilled className="size-5!" />
+        {config.brandIcon ?? <IconImageGeneration className="size-5!" />}
       </div>
       <span className="font-normal text-xl">
         <span className="font-black">{siteName}</span> Studio

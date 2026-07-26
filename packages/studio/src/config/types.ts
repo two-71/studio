@@ -4,6 +4,7 @@
 // standard-library-shaped values.
 
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
+import type { ReactNode } from "react";
 
 // --- Models & workflows (§4.1) ---------------------------------------------
 
@@ -112,6 +113,9 @@ export interface BillingProvider {
   refund(userId: string, ref: string): Promise<void>; // MUST be safe to call twice and for unknown refs
   topUpUrl?: string; // absent = no Buy CTA
   coinName?: string; // display label, default "coins"
+  // Dummy/free provider (e.g. freeBilling): hides all coin/cost UI and skips
+  // balance fetches entirely.
+  disabled?: boolean;
 }
 
 // --- Moderation (§4.3) ------------------------------------------------------
@@ -272,6 +276,9 @@ export interface StudioClientConfig {
     video: boolean;
     loras: boolean;
     poses: boolean;
+    // False when the billing provider is disabled (dummy/free): coin/cost UI
+    // is hidden and the balance endpoint is never called.
+    billing: boolean;
   };
   // Image-to-video pricing/options surfaced to the client (A2 gap: the spec's
   // VideoModelSpec has durations but no client-visible per-second cost).
@@ -294,4 +301,9 @@ export interface StudioClientConfig {
   onSignOut?: () => Promise<void>;
   // Redirect target after onSignOut resolves. Default "/login".
   loginUrl?: string;
+  // Brand tile icon (StudioBrand). Default is an image-generation glyph.
+  brandIcon?: ReactNode;
+  // Width in px of the decorative top-right notch (StudioNotch, lg+ only).
+  // Default 290 — widen it when the header hosts more controls.
+  notchWidth?: number;
 }

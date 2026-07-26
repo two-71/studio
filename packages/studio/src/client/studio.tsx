@@ -26,18 +26,24 @@ export function Studio({
   imageLoader,
   onSignOut,
   loginUrl,
+  brandIcon,
+  notchWidth,
 }: {
   config: StudioClientConfig;
   user: StudioUser;
   imageLoader?: StudioClientConfig["imageLoader"];
   onSignOut?: StudioClientConfig["onSignOut"];
   loginUrl?: string;
+  brandIcon?: StudioClientConfig["brandIcon"];
+  notchWidth?: StudioClientConfig["notchWidth"];
 }) {
   const resolvedConfig: StudioClientConfig = {
     ...config,
     imageLoader: imageLoader ?? config.imageLoader,
     onSignOut: onSignOut ?? config.onSignOut,
     loginUrl: loginUrl ?? config.loginUrl,
+    brandIcon: brandIcon ?? config.brandIcon,
+    notchWidth: notchWidth ?? config.notchWidth,
   };
   const [store] = useState(() => createStudioStore(resolvedConfig));
 
