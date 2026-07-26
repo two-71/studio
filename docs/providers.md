@@ -206,7 +206,7 @@ interface AuthAdapter {
 }
 ```
 
-The package never bundles an auth library — this is the entire surface it needs from yours. Route handlers created by `createStudioHandlers` call this once per request and respond `401` on `null`. A [better-auth](https://better-auth.com) wiring (what `apps/demo` uses) looks like:
+The package never bundles an auth library — this is the entire surface it needs from yours. Route handlers created by `createStudioHandlers` call this once per request and respond `401` on `null`. A [better-auth](https://better-auth.com) wiring looks like:
 
 ```ts
 const authAdapter: AuthAdapter = {
@@ -216,6 +216,8 @@ const authAdapter: AuthAdapter = {
   },
 };
 ```
+
+`apps/demo` runs a guest-mode variant instead: no login at all — `getSession` derives a stable salted-IP identity per visitor (`apps/demo/lib/guest.ts`) and upserts it as a user row, with a daily quota enforced through its `BillingProvider` (`guestBilling` in `apps/demo/studio.config.ts`). The better-auth session wiring above is preserved there as commented code.
 
 ## PromptSpec / PromptRunner
 
