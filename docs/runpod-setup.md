@@ -2,15 +2,15 @@
 
 Studio submits every generation to a [RunPod serverless](https://docs.runpod.io/serverless/overview) endpoint running [ComfyUI](https://github.com/comfyanonymous/ComfyUI). One endpoint = one `RunpodConfig.endpoints` entry, keyed by model id (or by the video model's `id`, if you configure `video`).
 
-There are two ways to get a working endpoint: the prebuilt worker image (fastest, what `apps/demo` uses) or a custom image (when you need extra ComfyUI nodes). Both sections below assume you're deploying the demo's `flux-schnell` model; substitute your own graph and model files for anything else.
+There are two ways to get a working endpoint: the prebuilt worker image (fastest, if your graph only needs ComfyUI's base node set) or a custom image (when you need extra nodes — what `apps/demo`'s two endpoints use). The prebuilt walkthrough below uses FLUX.1-schnell as its example model; substitute your own graph and model files.
 
 ## Prebuilt image path
 
-The easy path is RunPod's own [`runpod/worker-comfyui`](https://github.com/runpod-workers/worker-comfyui) serverless image. It bundles ComfyUI plus the base node set, so it works for any graph that doesn't need custom nodes — which is exactly what `apps/demo/workflows/flux-schnell.json` was authored to (see [What's in the graph](#whats-in-the-graph) below).
+The easy path is RunPod's own [`runpod/worker-comfyui`](https://github.com/runpod-workers/worker-comfyui) serverless image. It bundles ComfyUI plus the base node set, so it works for any graph that doesn't need custom nodes.
 
 1. On [runpod.io](https://www.runpod.io) → **Serverless** → **New Endpoint**, pick **Custom Source** → **Docker Image**.
-2. Use `runpod/worker-comfyui` with a tag that matches the model you're serving — check the image's tags on Docker Hub for the current one built with `flux1-schnell` support (the tag naming has changed over time, so don't hardcode a specific version in your own docs or scripts; read it off Docker Hub at deploy time).
-3. Attach the model files below to the endpoint's ComfyUI instance — either bake them into a derived image's `models/` tree, or mount a [RunPod network volume](https://docs.runpod.io/serverless/storage/network-volumes) pre-populated with them.
+2. Use `runpod/worker-comfyui` with a tag that matches the model you're serving — check the image's tags on Docker Hub for the current one built with support for your model (the tag naming has changed over time, so don't hardcode a specific version in your own docs or scripts; read it off Docker Hub at deploy time).
+3. Attach your graph's model files to the endpoint's ComfyUI instance — either bake them into a derived image's `models/` tree, or mount a [RunPod network volume](https://docs.runpod.io/serverless/storage/network-volumes) pre-populated with them. For FLUX.1-schnell, that's:
 
 | File | ComfyUI folder |
 | --- | --- |
@@ -24,11 +24,11 @@ All four ship under Apache 2.0/permissive licenses (`black-forest-labs/FLUX.1-sc
 4. Set the worker's return mode to **base64**, not S3/URL upload — see [Base64 output is required](#base64-output-is-required).
 5. Note the endpoint id RunPod assigns; that's the value that goes in `RunpodConfig.endpoints[modelId]` (`RUNPOD_ENDPOINT_ID` in the demo's env).
 
-### What's in the graph
+### Graph format and NodeMap
 
-`flux-schnell.json` is a ComfyUI graph in **API format** — the `/prompt`-style numbered-node shape the package's `runpod-client.ts` clones and patches, not the graph editor's `nodes`/`links` export format. The flow: `UNETLoader(flux1-schnell.safetensors)` → `DualCLIPLoader(t5xxl_fp8_e4m3fn.safetensors, clip_l.safetensors, type=flux)` → `CLIPTextEncode` (positive, node `4`) → `ConditioningZeroOut` (negative — schnell needs no real negative/CFG since `cfg=1.0`) → `EmptySD3LatentImage` (1024×1024, batch=1) → `KSampler` (node `7`, steps=4, cfg=1.0, sampler=euler, scheduler=simple) → `VAEDecode` → `SaveImage`, with `VAELoader(ae.safetensors)` feeding `VAEDecode`.
+Every workflow file you hand to Studio must be a ComfyUI graph in **API format** — the `/prompt`-style numbered-node shape the package's `runpod-client.ts` clones and patches, not the graph editor's `nodes`/`links` export format (in the ComfyUI editor: **Export (API)**).
 
-Only `prompt` (node `4`, input `text`) and `seed` (node `7`, input `seed`) are wired through the model's `NodeMap` — there's no `aspectRatio` target, because that would need a custom node that turns a ratio label into a resolution, which the vanilla worker image doesn't ship. `EmptySD3LatentImage` is fixed at 1024×1024 instead, which is why this model's `ratios` is `["1:1"]` only. If your graph needs more node targets wired (aspect ratio, LoRA slots, pose/reference toggles), see `NodeMap` in `packages/studio/src/config/types.ts` for the full set the client understands.
+You tell Studio which graph inputs to patch through the model's `NodeMap`: at minimum `prompt` and `seed`, optionally `aspectRatio` (a node/input that turns a ratio label into a resolution — usually a custom node), LoRA slots, and pose/reference toggles + images. See `NodeMap` in `packages/studio/src/config/types.ts` for the full set, and `apps/demo/studio.config.ts` for two worked examples (`workflows/krea2.json` with LoRA/pose/reference wiring, `workflows/ltx2-3.json` for image-to-video).
 
 ### Base64 output is required
 
@@ -36,7 +36,7 @@ Only `prompt` (node `4`, input `text`) and `seed` (node `7`, input `seed`) are w
 
 ## Custom image path
 
-Build your own image when the graph needs nodes `runpod/worker-comfyui` doesn't ship (custom samplers, upscalers, ControlNet preprocessors, etc.):
+Build your own image when the graph needs nodes `runpod/worker-comfyui` doesn't ship (custom samplers, upscalers, ControlNet preprocessors, etc.). This is what both of `apps/demo`'s endpoints do — its Krea 2 graph uses rgthree's Power Lora Loader/Seed plus the Krea 2 control/edit node pack, and its LTX 2.3 graph uses VHS video combine, KJNodes, and friends:
 
 1. Start `FROM runpod/worker-comfyui:<base-tag>` (or ComfyUI's own base image) and `RUN` your custom node installs (`comfy node install …` or manual `git clone` into `custom_nodes/`).
 2. Bake in or volume-mount the same kind of model-file table as above, sized to whatever checkpoint/LoRAs/ControlNets your graph references.
@@ -73,5 +73,5 @@ RunPod serverless endpoints have a few knobs worth setting deliberately:
 - **Job completes but the image never appears / isn't watermarked** — the endpoint is returning URLs instead of base64. Fix the worker's return-mode setting (see [Base64 output is required](#base64-output-is-required)).
 - **`runpod run failed: 4xx …`** — usually a bad `RUNPOD_API_KEY` or an endpoint id from the wrong RunPod account/team.
 - **Generation always ends in `timed_out`** — either the endpoint is too slow for the token timeout (10m image / 20m video), or workers are scaled to zero with an idle timeout so short the first request never finishes queuing before RunPod's own execution timeout hits. Check the RunPod dashboard's request logs for the actual job, not just the Studio row.
-- **ComfyUI validation error mentioning a missing node or model file** — the endpoint's ComfyUI instance is missing a model file (check the table above) or a custom node your graph references (see the custom image path).
+- **ComfyUI validation error mentioning a missing node or model file** — the endpoint's ComfyUI instance is missing a model file your graph references, or a custom node it needs (see the custom image path).
 - **CUDA out of memory** — GPU tier too small for the loaded models; see [Endpoint settings](#endpoint-settings).
