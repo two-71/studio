@@ -1,6 +1,10 @@
 import { deriveClientConfig } from "@two-71/studio";
 import { headers } from "next/headers";
-import { ensureGuestUser, guestFromHeaders } from "@/lib/guest";
+import {
+  ensureGuestUser,
+  GUEST_DAILY_LIMIT,
+  guestFromHeaders,
+} from "@/lib/guest";
 import { studioConfig } from "@/studio.config";
 import { StudioClient } from "./studio-client";
 
@@ -28,5 +32,13 @@ export default async function StudioPage() {
   // allowed to cross into the client tree.
   const clientConfig = deriveClientConfig(studioConfig);
 
-  return <StudioClient config={clientConfig} user={guest} />;
+  // GUEST_DAILY_LIMIT is env-driven and server-only; the welcome dialog quotes
+  // it, so it crosses as a prop rather than being hardcoded in the copy.
+  return (
+    <StudioClient
+      config={clientConfig}
+      dailyLimit={GUEST_DAILY_LIMIT}
+      user={guest}
+    />
+  );
 }

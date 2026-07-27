@@ -1,4 +1,8 @@
 @import "tailwindcss";
+/* Enter/exit keyframes for the radix-driven dialogs (animate-in, fade-in-0,
+   zoom-in-95 …) used by both this app's welcome dialog and the package's
+   modals. */
+@import "tw-animate-css";
 
 /* The studio package ships TypeScript source that lives outside this app's
    auto-scanned files — without @source, Tailwind emits none of the utility
