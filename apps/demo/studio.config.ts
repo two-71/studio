@@ -1,14 +1,14 @@
 // Demo StudioConfig: guest billing, open
 // moderation, one SFW Krea 2 image model (with style loras + identity-edit
-// reference support) and an LTX 2.3 image-to-video model, no prompts
-// (enhance/title off — both fall back to the package defaults), no
-// watermark spec, no notify hook.
+// reference support) and an LTX 2.3 image-to-video model, OpenAI-backed
+// prompt enhancement and titling, no watermark spec, no notify hook.
 //
 // No "server-only" import guard, matching the package's own handlers.ts: the
 // same config module is imported by both Next route handlers and
 // trigger/studio.ts, and Trigger.dev's esbuild bundler doesn't set the
 // "react-server" condition server-only relies on.
 
+import { openai } from "@ai-sdk/openai";
 import {
   type AuthAdapter,
   allowAllModeration,
@@ -167,6 +167,18 @@ const ltx23: VideoModelSpec = {
   },
 };
 
+// Prompt enhancement and gallery titles run inside the package: it only needs
+// a Vercel AI SDK model (the provider carries the API key) and, optionally, a
+// system prompt overriding the package default. Both features are gated on
+// OPENAI_API_KEY so the demo still runs without an OpenAI account — without
+// it the enhance toggle stays hidden and titles fall back to a prompt excerpt.
+const promptModel = process.env.OPENAI_API_KEY
+  ? openai("gpt-5-mini")
+  : undefined;
+const prompts = promptModel
+  ? { enhance: { model: promptModel }, title: { model: promptModel } }
+  : undefined;
+
 export const studioConfig: StudioConfig = {
   models: [krea2],
   video: ltx23,
@@ -187,6 +199,7 @@ export const studioConfig: StudioConfig = {
   auth: guestAuthAdapter, // account mode: authAdapter
   billing: guestBilling, // account mode: freeBilling
   moderation: allowAllModeration,
+  prompts,
   branding: {
     siteName: "2.71",
   },

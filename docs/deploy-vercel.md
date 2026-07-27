@@ -20,6 +20,7 @@ Set these in the Vercel project's **Settings → Environment Variables** (mirror
 | `R2_SECRET_ACCESS_KEY` | Bucket secret access key. |
 | `R2_BUCKET` | Bucket name. |
 | `R2_PUBLIC_URL` | Public base URL generated image/video URLs are served from. |
+| `OPENAI_API_KEY` | Optional — powers prompt enhancement and gallery titles. Unset: the enhance toggle is hidden and titles fall back to a prompt excerpt. |
 
 Set each var for every Vercel environment you use (Production / Preview / Development) with the values appropriate to that environment — in particular, `TRIGGER_SECRET_KEY` and `RUNPOD_ENDPOINT_ID` are very likely to differ between Preview and Production.
 

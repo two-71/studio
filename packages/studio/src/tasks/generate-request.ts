@@ -7,6 +7,7 @@
 
 import { logger, metadata, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
+import { runEnhance } from "../ai/prompt-runners";
 import { RATIO_KEYS, type StudioConfig } from "../config/types";
 import type { GenerateImagePayload, GenerateImageTask } from "./generate-image";
 import type { GenerateTitleTask } from "./generate-title";
@@ -91,9 +92,9 @@ export function createGenerateRequestTask(
     // intent. On "rewrite" the enhancement is discarded: it was built from a
     // prompt moderation said needed rewriting.
     metadata.set("step", "processing-prompt");
-    const enhance = config.promptRunner?.enhance;
+    const enhanceSpec = config.prompts?.enhance;
     const enhancePromise: Promise<string> =
-      payload.enhance && enhance
+      payload.enhance && enhanceSpec
         ? logger.trace("enhance-prompt", async (span) => {
             span.setAttribute("input.prompt", payload.prompt);
             // Searched across every configured model's loras (not just one
@@ -105,7 +106,7 @@ export function createGenerateRequestTask(
               .filter((lora) => payload.loras.includes(lora.id))
               .map((lora) => lora.triggerWords)
               .filter((words): words is string => Boolean(words));
-            const out = await enhance(payload.prompt, {
+            const out = await runEnhance(enhanceSpec, payload.prompt, {
               referenceImage,
               poseImage,
               triggerWords,

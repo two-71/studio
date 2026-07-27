@@ -120,7 +120,7 @@ interface ModerationProvider {
 
 Contract notes, from how `generate-request.ts` (the orchestrator task) actually calls it:
 
-- **Called once per generate request**, concurrently with the enhance step, over the user's original typed prompt — not the enhanced one. Moderation gates the user's intent; the enhancer runs over an already-moderated prompt (see [PromptSpec / PromptRunner](#promptspec--promptrunner) below).
+- **Called once per generate request**, concurrently with the enhance step, over the user's original typed prompt — not the enhanced one. Moderation gates the user's intent; the enhancer runs over an already-moderated prompt (see [PromptSpec](#promptspec) below).
 - **Fail-closed.** `check` rejecting or throwing is treated exactly like any other task error: the orchestrator catches it, marks every row in the batch `failed` with reason `moderation_unavailable`, and stops — it does **not** fall back to allowing the prompt through. If your moderation call can fail (network error, upstream 5xx), let that surface as a thrown error rather than swallowing it into an `"allow"`.
 - **`{ action: "block" }` short-circuits generation** — rows are marked failed with reason `content_policy` and no RunPod job is ever submitted or charged.
 - **`{ action: "allow", rewritten }` swaps the prompt.** If you rewrite instead of blocking, the rewritten text is what actually gets sent to RunPod (and is what the enhancer's output is discarded in favor of — see the note above); the original is preserved separately as `originalPrompt` on the row.
@@ -219,34 +219,62 @@ const authAdapter: AuthAdapter = {
 
 `apps/demo` runs a guest-mode variant instead: no login at all — `getSession` derives a stable salted-IP identity per visitor (`apps/demo/lib/guest.ts`) and upserts it as a user row, with a daily quota enforced through its `BillingProvider` (`guestBilling` in `apps/demo/studio.config.ts`). The better-auth session wiring above is preserved there as commented code.
 
-## PromptSpec / PromptRunner
+## PromptSpec
 
 ```ts
 interface PromptSpec {
-  system: string;
-  model: string;
-  baseUrl: string; // any OpenAI-compatible endpoint
-  apiKey: string;
-  temperature?: number;
+  model: LanguageModel; // Vercel AI SDK model
+  system?: string;      // omit = package default
 }
 
-interface EnhanceContext {
-  referenceImage?: string;
-  poseImage?: string;
-  triggerWords?: string[];
-}
-
-interface PromptRunner {
-  enhance?: (prompt: string, context: EnhanceContext) => Promise<string>;
-  title?: (prompt: string) => Promise<string | null>;
-}
+prompts?: { enhance?: PromptSpec; title?: PromptSpec };
 ```
 
-`StudioConfig.prompts` (`PromptSpec`) describes *which* model/endpoint you'd use, but the task layer doesn't call it directly — the actual invocation is `StudioConfig.promptRunner`. Supply `promptRunner.enhance`/`.title` as plain async functions (wrapping a Vercel AI SDK call, a direct `fetch`, or anything else) that do the LLM call themselves. If you configure `prompts` for documentation/UI purposes but don't wire `promptRunner`, enhancement and titling silently fall back to their no-op defaults below — `promptRunner` is what actually turns the feature on.
+Unlike the other seams, enhancement and titling aren't functions you implement — the package runs them itself through the [Vercel AI SDK](https://ai-sdk.dev) (`ai` is a peer dependency). You hand it a model, which already carries the provider, model name, base URL and API key:
 
-- **`promptRunner.enhance` absent** → the enhancement toggle is hidden in the UI (`StudioClientConfig.features.enhance` is derived from `Boolean(config.prompts?.enhance)`), and the orchestrator uses the original prompt unchanged.
-- **`promptRunner.title` absent** → generated titles fall back to a prompt excerpt instead of an LLM call (`generate-title.ts`).
-- `EnhanceContext.triggerWords` is resolved by the orchestrator from whichever of your configured models' `loras` match the request's selected LoRA ids — your `enhance` function doesn't need to look those up itself.
+```ts
+import { openai } from "@ai-sdk/openai";
+
+prompts: {
+  enhance: { model: openai("gpt-5-mini") }, // needs vision — it reads the control images
+  title: { model: openai("gpt-5-mini") },
+},
+```
+
+Any AI SDK provider works — `@ai-sdk/anthropic`, `@ai-sdk/openai-compatible` against a self-hosted or third-party endpoint, a gateway model id string, or a `wrapLanguageModel`-wrapped model if you want to hook tracing into the call.
+
+- **`prompts.enhance` absent** → the enhancement toggle is hidden in the UI (`StudioClientConfig.features.enhance` is derived from `Boolean(config.prompts?.enhance)`), and the orchestrator uses the original prompt unchanged.
+- **`prompts.title` absent** → generated titles fall back to a prompt excerpt instead of an LLM call (`generate-title.ts`).
+- Both calls are **best-effort**: a provider error falls back to the original prompt / a prompt excerpt and never fails a generation. (Moderation, by contrast, is fail-closed.)
+
+### System prompts and placeholders
+
+Omit `system` and the package uses its own default — `ENHANCE_SYSTEM` or `TITLE_SYSTEM`, both exported from `@two-71/studio` so you can extend rather than rewrite them.
+
+The enhance system prompt is a template. Before each call the package substitutes three placeholders with the matching block when the request carries that input, and with `""` when it doesn't:
+
+| Placeholder | Filled when | Replaced with |
+| --- | --- | --- |
+| `{{REFERENCE_BLOCK}}` | the request has a reference image | `REFERENCE_BLOCK` — tells the model to describe the attached reference and that the typed prompt outranks it |
+| `{{POSE_BLOCK}}` | the request has a pose preset | `POSE_BLOCK` — tells the model the attached grayscale image is a depth map defining the body position |
+| `{{LORA_BLOCK}}` | the request enabled LoRAs that declare `triggerWords` | `LORA_BLOCK`, with its own `{{TRIGGER_WORDS}}` placeholder filled with the quoted, `; `-joined phrases |
+
+Trigger words are resolved by the orchestrator from whichever of your configured models' `loras` match the request's selected LoRA ids — nothing to wire up.
+
+All four blocks are exported alongside the system prompts, so a custom `system` can place them wherever you want:
+
+```ts
+import { ENHANCE_SYSTEM, POSE_BLOCK } from "@two-71/studio";
+
+prompts: {
+  enhance: {
+    model: openai("gpt-5-mini"),
+    system: `${ENHANCE_SYSTEM}\n\nAlways render the subject in a photorealistic style.`,
+  },
+},
+```
+
+A custom system prompt with no placeholders is valid — it just means the model is never told what the attached control images are (they're still sent).
 
 ## notify
 

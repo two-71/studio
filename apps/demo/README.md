@@ -36,6 +36,9 @@ real-accounts example instead.
      "RunPod endpoints" below).
    - `R2_*` — any S3-compatible bucket (Cloudflare R2, etc.) for generated
      images and videos.
+   - `OPENAI_API_KEY` — optional, powers prompt enhancement and gallery
+     titles (`gpt-5-mini`). Leave it unset and the enhance toggle stays
+     hidden while titles fall back to a prompt excerpt.
 
 2. **Database migrations**
 

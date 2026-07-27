@@ -6,6 +6,7 @@
 
 import { logger, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
+import { runTitle } from "../ai/prompt-runners";
 import type { StudioConfig } from "../config/types";
 import type { TaskGenerationQueries } from "./generation-queries";
 
@@ -21,7 +22,7 @@ export type GenerateTitlePayload = z.infer<typeof generateTitlePayloadSchema>;
 const EXCERPT_WORD_COUNT = 4;
 const WHITESPACE_RE = /\s+/;
 
-// Fallback when promptRunner.title isn't configured: a short
+// Fallback when prompts.title isn't configured: a short
 // excerpt of the typed prompt instead of an LLM call.
 function excerptTitle(prompt: string): string {
   return prompt
@@ -44,8 +45,9 @@ export function createGenerateTitleTask(
     run: async (payload) => {
       const title = await logger.trace("title-llm", async (span) => {
         span.setAttribute("input.prompt", payload.prompt);
-        const out = config.promptRunner?.title
-          ? await config.promptRunner.title(payload.prompt)
+        const spec = config.prompts?.title;
+        const out = spec
+          ? await runTitle(spec, payload.prompt)
           : excerptTitle(payload.prompt);
         span.setAttribute("output.title", out ?? "");
         return out;

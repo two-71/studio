@@ -34,7 +34,7 @@ See the [repo docs](https://github.com/two-71/studio) for the full setup guide (
 bun add @two-71/studio
 ```
 
-Peer dependencies (install alongside): `next`, `react`, `react-dom`, `@trigger.dev/sdk`, `@trigger.dev/react-hooks`, `drizzle-orm`, `@tanstack/react-query`, `zod`.
+Peer dependencies (install alongside): `next`, `react`, `react-dom`, `@trigger.dev/sdk`, `@trigger.dev/react-hooks`, `drizzle-orm`, `@tanstack/react-query`, `zod`, `ai` (the Vercel AI SDK, used for prompt enhancement and titles — plus a provider package such as `@ai-sdk/openai` if you enable them).
 
 The package ships TypeScript source, so your app must compile and scan it:
 
@@ -55,7 +55,7 @@ transpilePackages: ["@two-71/studio"],
 
 | Import | Contains |
 | --- | --- |
-| `@two-71/studio` | `StudioConfig` and related types, `deriveClientConfig`, `freeBilling`/`allowAllModeration` defaults |
+| `@two-71/studio` | `StudioConfig` and related types, `deriveClientConfig`, `freeBilling`/`allowAllModeration` defaults, the default enhance/title system prompts |
 | `@two-71/studio/server` | `createStudioHandlers` (the API route), `embedPngText`, `applyWatermarks` |
 | `@two-71/studio/client` | `<Studio />`, `useStudioConfig`, `useStudioUser`, `copyImage`/`downloadImage`, `useMountEffect` |
 | `@two-71/studio/tasks` | `createStudioTasks` (the five Trigger.dev tasks) and their payload schemas |
@@ -63,7 +63,7 @@ transpilePackages: ["@two-71/studio"],
 
 ## Wiring
 
-All four pieces below are built from one `StudioConfig` object — assemble it once (e.g. in `studio.config.ts`) and reuse it everywhere. `StudioConfig` requires: `models`, `runpod`, `storage`, `auth`, `billing`, `moderation`, and `db` (your Drizzle instance); `video`, `prompts`, `promptRunner`, `watermark`, `branding`, and `notify` are optional.
+All four pieces below are built from one `StudioConfig` object — assemble it once (e.g. in `studio.config.ts`) and reuse it everywhere. `StudioConfig` requires: `models`, `runpod`, `storage`, `auth`, `billing`, `moderation`, and `db` (your Drizzle instance); `video`, `prompts`, `watermark`, `branding`, and `notify` are optional.
 
 **Database schema** — spread the generation table into your own schema:
 

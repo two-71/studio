@@ -1,6 +1,6 @@
 {
   "name": "@two-71/studio",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Self-hostable AI image/video generation studio for Next.js — RunPod ComfyUI workflows, Trigger.dev tasks, pluggable billing/moderation/storage providers",
   "license": "MIT",
   "repository": {
@@ -36,7 +36,8 @@
     "@trigger.dev/react-hooks": "^4.5.4",
     "drizzle-orm": "^0.45.2",
     "@tanstack/react-query": "^5.100.11",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "ai": "^7.0.19"
   },
   "dependencies": {
     "zustand": "^5.0.13",

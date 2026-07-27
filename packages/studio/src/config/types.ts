@@ -3,6 +3,7 @@
 // lib/billing, lib/ai, better-auth, …) — only generic types and small
 // standard-library-shaped values.
 
+import type { LanguageModel } from "ai";
 import type { NodePgDatabase } from "drizzle-orm/node-postgres";
 import type { ReactNode } from "react";
 
@@ -130,33 +131,19 @@ export interface ModerationProvider {
 
 // --- Prompts -----------------------------------------------------------------
 
+// Everything the package needs to run an enhance/title call itself: a Vercel
+// AI SDK model (which already carries the provider, model name, base URL and
+// API key) and an optional system prompt.
+//
+// Omitting `system` uses the package default (ENHANCE_SYSTEM / TITLE_SYSTEM).
+// An enhance system prompt — default or custom — is templated: the
+// {{REFERENCE_BLOCK}}, {{POSE_BLOCK}} and {{LORA_BLOCK}} placeholders are
+// replaced with the matching block when the request carries that input, and
+// with "" otherwise. A custom system prompt without placeholders gets no block
+// instructions (the control images still reach the model, unannounced).
 export interface PromptSpec {
-  system: string;
-  model: string;
-  baseUrl: string; // any OpenAI-compatible endpoint
-  apiKey: string;
-  temperature?: number;
-}
-
-// Per-request context an enhance call may fold into its system prompt (a
-// reference/pose control image, LoRA trigger words). Structurally identical
-// to a typical host's own EnhanceContext (e.g. an enhance.ts module) so a
-// host's existing enhance function satisfies this without a wrapper.
-export interface EnhanceContext {
-  referenceImage?: string;
-  poseImage?: string;
-  triggerWords?: string[];
-}
-
-// A2 addition: PromptSpec (above) only describes *which* model/endpoint a
-// host uses — it was never actually wired to an invocation (see
-// studio.config.ts's prompts comment). The pipeline needs something it can
-// call, so a host supplies the actual function here; the package has no
-// generic caller of its own. Absent entries fall back: no enhance call
-// (original prompt passes through), title falls back to a prompt excerpt.
-export interface PromptRunner {
-  enhance?: (prompt: string, context: EnhanceContext) => Promise<string>;
-  title?: (prompt: string) => Promise<string | null>;
+  model: LanguageModel;
+  system?: string;
 }
 
 // --- Storage & auth ---------------------------------------------------------
@@ -240,7 +227,6 @@ export interface StudioConfig {
   billing: BillingProvider;
   moderation: ModerationProvider;
   prompts?: { enhance?: PromptSpec; title?: PromptSpec }; // omit a key = feature off
-  promptRunner?: PromptRunner; // the actual enhance/title call (A2 addition, see PromptRunner)
   watermark?: WatermarkSpec; // omit = no watermark
   branding?: BrandingSpec;
   notify?: (event: GenerationEvent) => Promise<void>; // omit = no notifications
