@@ -1,0 +1,51 @@
+/* Studio's Tailwind glue — import this once from your app's CSS, after
+   `@import "tailwindcss"`:
+
+     @import "@two-71/studio/styles.css";
+
+   It does two things a consumer app can't infer on its own:
+
+   1. `@source` — Tailwind never scans node_modules, so without it none of the
+      package's utility classes are emitted.
+   2. The `data-*` custom variants below. The components are written in the
+      shadcn/ui idiom (`data-checked:`, `data-open:` …), which is *not* stock
+      Tailwind: those variants ship in `shadcn/tailwind.css`. Apps built on the
+      shadcn CLI already have them; apps that aren't would silently render
+      switches with no track colour and dialogs with no enter/exit animation. */
+
+@source "./";
+
+@custom-variant data-open {
+  &:where([data-state="open"]),
+  &:where([data-open]:not([data-open="false"])) {
+    @slot;
+  }
+}
+
+@custom-variant data-closed {
+  &:where([data-state="closed"]),
+  &:where([data-closed]:not([data-closed="false"])) {
+    @slot;
+  }
+}
+
+@custom-variant data-checked {
+  &:where([data-state="checked"]),
+  &:where([data-checked]:not([data-checked="false"])) {
+    @slot;
+  }
+}
+
+@custom-variant data-unchecked {
+  &:where([data-state="unchecked"]),
+  &:where([data-unchecked]:not([data-unchecked="false"])) {
+    @slot;
+  }
+}
+
+@custom-variant data-disabled {
+  &:where([data-disabled="true"]),
+  &:where([data-disabled]:not([data-disabled="false"])) {
+    @slot;
+  }
+}

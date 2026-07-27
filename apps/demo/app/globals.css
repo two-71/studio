@@ -4,10 +4,10 @@
    modals. */
 @import "tw-animate-css";
 
-/* The studio package ships TypeScript source that lives outside this app's
-   auto-scanned files — without @source, Tailwind emits none of the utility
-   classes its components use (responsive md:/lg: variants included). */
-@source "../../../packages/studio/src";
+/* The studio package's Tailwind glue: @source for its TypeScript source (which
+   lives outside this app's auto-scanned files) plus the shadcn-style data-*
+   custom variants its components are written against. */
+@import "@two-71/studio/styles.css";
 
 /* Class-based dark mode (next-themes sets .dark/.light on <html>) — dark:
    variants must follow the class, not the media query, so the manual theme

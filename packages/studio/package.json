@@ -25,7 +25,8 @@
     "./server": "./src/server/index.ts",
     "./client": "./src/client/index.ts",
     "./tasks": "./src/tasks/index.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./styles.css": "./src/styles.css"
   },
   "peerDependencies": {
     "next": "^16.2.6",
