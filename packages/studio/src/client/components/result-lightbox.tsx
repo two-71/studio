@@ -659,6 +659,15 @@ export function ResultLightbox() {
   const [compareKey, setCompareKey] =
     useState<CompareSource["key"]>("reference");
 
+  // Compare mode belongs to the image being viewed, so drop it whenever the
+  // lightbox moves to a sibling or closes — however it closed.
+  const [prevLightboxId, setPrevLightboxId] = useState(lightboxId);
+  if (prevLightboxId !== lightboxId) {
+    setPrevLightboxId(lightboxId);
+    setCompareOn(false);
+    setCompareKey("reference");
+  }
+
   const open = lightboxId !== null;
   const count = results.length;
   const currentIndex = results.findIndex((result) => result.id === lightboxId);
@@ -678,7 +687,6 @@ export function ResultLightbox() {
     if (!hasSiblings) {
       return;
     }
-    setCompareOn(false);
     setLightboxId(results[(currentIndex + dir + count) % count].id);
   };
 
@@ -724,8 +732,6 @@ export function ResultLightbox() {
     <DialogPrimitive.Root
       onOpenChange={(next) => {
         if (!next) {
-          setCompareOn(false);
-          setCompareKey("reference");
           closeLightbox();
         }
       }}
