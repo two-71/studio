@@ -234,7 +234,7 @@ function LoraTile({
         // version overflowed its row and tiles overlapped.
         "group relative w-full cursor-pointer overflow-hidden rounded-2xl border bg-muted/30 pt-[100%] transition-colors",
         enabled
-          ? "border-primary/50 ring-2 ring-primary ring-inset"
+          ? "border-primary/50"
           : "border-border hover:border-muted-foreground/40"
       )}
       onClick={onToggle}
@@ -261,6 +261,11 @@ function LoraTile({
           </span>
         </span>
       )}
+      {/* An inset ring on the button itself paints under the thumbnail, so it
+          reads thinner on tiles that have one — draw it over the content. */}
+      {enabled ? (
+        <span className="pointer-events-none absolute inset-0 rounded-2xl ring-2 ring-primary ring-inset" />
+      ) : null}
     </button>
   );
 }
