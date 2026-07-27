@@ -142,7 +142,9 @@ function LoraModalBody({
         />
       </div>
       <div
-        className="-mr-2 grid min-h-0 min-w-0 flex-1 grid-cols-3 content-start gap-2 overflow-y-auto pr-2 sm:grid-cols-5"
+        // items-start keeps tiles at their auto height so aspect-square applies;
+        // stretched grid items get a definite height and drop the aspect ratio.
+        className="-mr-2 grid min-h-0 min-w-0 flex-1 grid-cols-3 content-start items-start gap-2 overflow-y-auto pr-2 sm:grid-cols-5"
         onScroll={(event) => updateScrollEdges(event.currentTarget)}
         ref={updateScrollEdges}
         style={{
