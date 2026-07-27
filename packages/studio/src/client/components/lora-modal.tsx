@@ -142,9 +142,7 @@ function LoraModalBody({
         />
       </div>
       <div
-        // items-start keeps tiles at their auto height so aspect-square applies;
-        // stretched grid items get a definite height and drop the aspect ratio.
-        className="-mr-2 grid min-h-0 min-w-0 flex-1 grid-cols-3 content-start items-start gap-2 overflow-y-auto pr-2 sm:grid-cols-5"
+        className="-mr-2 grid min-h-0 min-w-0 flex-1 grid-cols-3 content-start gap-2 overflow-y-auto pr-2 sm:grid-cols-5"
         onScroll={(event) => updateScrollEdges(event.currentTarget)}
         ref={updateScrollEdges}
         style={{
@@ -231,7 +229,10 @@ function LoraTile({
       aria-label={`Toggle ${lora.name} LoRA`}
       aria-pressed={enabled}
       className={cn(
-        "group relative aspect-square cursor-pointer overflow-hidden rounded-2xl border bg-muted/30 transition-colors",
+        // The square comes from percentage padding rather than aspect-square:
+        // a grid item's aspect ratio doesn't feed row sizing, so the ratio
+        // version overflowed its row and tiles overlapped.
+        "group relative w-full cursor-pointer overflow-hidden rounded-2xl border bg-muted/30 pt-[100%] transition-colors",
         enabled
           ? "border-primary/50 ring-2 ring-primary ring-inset"
           : "border-border hover:border-muted-foreground/40"
@@ -254,7 +255,7 @@ function LoraTile({
           </span>
         </>
       ) : (
-        <span className="flex h-full items-center justify-center p-1.5 text-center">
+        <span className="absolute inset-0 flex items-center justify-center p-1.5 text-center">
           <span className="line-clamp-3 break-words text-muted-foreground text-xs">
             {lora.name}
           </span>
