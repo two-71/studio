@@ -14,7 +14,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^4.0.20",
     "@tanstack/react-query": "^5.100.11",
-    "@trigger.dev/sdk": "^4.5.4",
+    "@trigger.dev/sdk": "4.5.7",
     "@two-71/studio": "workspace:*",
     "ai": "^7.0.37",
     "better-auth": "^1.6.11",
