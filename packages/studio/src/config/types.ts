@@ -38,7 +38,10 @@ export interface NodeMap {
   referenceLoraToggle?: NodeTarget;
   poseImage?: NodeTarget;
   referenceImage?: NodeTarget;
-  loras?: Record<string, NodeTarget>;
+  // rgthree Power Lora Loader node enabled LoRAs are appended to at request
+  // build time (`lora_N` slots after any the graph already declares, e.g. an
+  // identity-edit lora_1). Replaces per-LoRA slot mappings.
+  loraLoader?: { node: string };
   // Image-to-video only: LoadImage node for the source frame and the
   // frame-count node (fps × seconds). Spec's WorkflowSpec has no separate
   // slot for these (today's ModelRuntime.video carried them outside `nodes`)
@@ -54,11 +57,18 @@ export interface WorkflowSpec {
 }
 
 export interface LoraSpec {
+  // Must not contain "@" — persisted selections encode as "id@strength".
   id: string;
   name: string;
+  // Filename under the endpoint's models/loras directory.
+  file: string;
   triggerWords?: string;
   thumbnailUrl?: string;
-  slotKey: string;
+  // Fixed weight applied when enabled (default 1).
+  strength?: number;
+  // Presence renders a weight slider in the LoRA dialog; the user's value is
+  // clamped to [min, max] server-side.
+  strengthRange?: { min: number; max: number; step: number; default: number };
 }
 
 export interface PoseSpec {

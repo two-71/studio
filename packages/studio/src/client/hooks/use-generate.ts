@@ -76,7 +76,7 @@ interface StartContext {
   ratio: StartGenerationInput["ratio"];
   resolution: StartGenerationInput["resolutionTier"];
   controlImages: ControlImages;
-  enabledLoraIds: string[];
+  enabledLoras: StartGenerationInput["loras"];
 }
 
 function buildStartInput(ctx: StartContext): StartGenerationInput {
@@ -95,7 +95,7 @@ function buildStartInput(ctx: StartContext): StartGenerationInput {
     ...(ctx.controlImages.reference
       ? { referenceImage: ctx.controlImages.reference }
       : {}),
-    ...(ctx.enabledLoraIds.length > 0 ? { loras: ctx.enabledLoraIds } : {}),
+    ...(ctx.enabledLoras?.length ? { loras: ctx.enabledLoras } : {}),
   };
 }
 
@@ -138,7 +138,7 @@ export function useGenerate() {
       poseImage,
       referenceImage,
       referenceImageOversized,
-      enabledLoraIds,
+      enabledLoras,
       promptEnhancement,
       generating,
       setGenerating,
@@ -200,7 +200,7 @@ export function useGenerate() {
             ratio,
             resolution,
             controlImages,
-            enabledLoraIds,
+            enabledLoras,
           })
         );
       } catch (err) {

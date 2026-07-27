@@ -1,4 +1,5 @@
 import type { KyInstance } from "ky";
+import type { LoraSelection } from "../../config/lora-selection";
 import type { RatioKey, ResolutionKey } from "../../config/types";
 
 export interface StartGenerationInput {
@@ -15,8 +16,8 @@ export interface StartGenerationInput {
   poseImage?: string;
   /** Pure base64 (no data-URL prefix) reference image, control models only. */
   referenceImage?: string;
-  /** Enabled predefined LoRA ids, control models only. */
-  loras?: string[];
+  /** Enabled predefined LoRAs (id + optional slider strength). */
+  loras?: LoraSelection[];
   /** Preset URL when poseImage is a bundled preset rather than an upload. */
   posePreset?: string;
 }

@@ -75,16 +75,6 @@
         "lora": "krea2_identity_edit_v1_2.safetensors",
         "strength": 1
       },
-      "lora_2": {
-        "on": false,
-        "lora": "lenovo_krea2.safetensors",
-        "strength": 1
-      },
-      "lora_3": {
-        "on": false,
-        "lora": "phone_photography_2025_krea2.safetensors",
-        "strength": 1
-      },
       "➕ Add Lora": "",
       "model": ["6", 0]
     },

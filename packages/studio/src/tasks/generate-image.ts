@@ -12,6 +12,10 @@
 
 import { logger, metadata, schemaTask, wait } from "@trigger.dev/sdk";
 import { z } from "zod";
+import {
+  decodeLoraSelection,
+  resolveLoraStrength,
+} from "../config/lora-selection";
 import { RATIO_KEYS, type StudioConfig } from "../config/types";
 import type { TaskGenerationQueries } from "./generation-queries";
 import type { NotifyGenerationTask } from "./notify-generation";
@@ -101,6 +105,21 @@ export function createGenerateImageTask(
       );
       return;
     }
+    // Encoded "id@strength" selections resolve against the model's LoRA
+    // catalog; unknown ids (removed from config since submit) are dropped.
+    const loras = payload.loras.flatMap((value) => {
+      const selection = decodeLoraSelection(value);
+      const spec = model.loras?.find((lora) => lora.id === selection.id);
+      return spec
+        ? [
+            {
+              file: spec.file,
+              strength: resolveLoraStrength(spec, selection.strength),
+            },
+          ]
+        : [];
+    });
+
     metadata.set("step", "downloading-inputs");
     const [poseImage, referenceImage] = await logger.trace(
       "download-control-inputs",
@@ -144,7 +163,7 @@ export function createGenerateImageTask(
             seed: payload.seed,
             poseImage,
             referenceImage,
-            loras: payload.loras,
+            loras,
             aspect_ratio: RATIO_TO_ASPECT_RATIO[payload.ratio],
           },
           token.url

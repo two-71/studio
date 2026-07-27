@@ -15,6 +15,7 @@
 import { createContext, useContext } from "react";
 import { createStore, useStore } from "zustand";
 import { persist } from "zustand/middleware";
+import type { LoraSelection } from "../../config/lora-selection";
 import type {
   RatioKey,
   ResolutionKey,
@@ -28,7 +29,7 @@ type PersistedOptions = Pick<
   | "selectedModelIds"
   | "ratio"
   | "poseImage"
-  | "enabledLoraIds"
+  | "enabledLoras"
 >;
 
 export interface StudioState {
@@ -46,8 +47,9 @@ export interface StudioState {
   // Pose control image: a preset URL from a model's poses or an uploaded data
   // URL. Presence means it's sent as base64 with the run.
   poseImage: string | null;
-  // Ids of enabled predefined LoRAs (see a model's `loras`); sent with the run.
-  enabledLoraIds: string[];
+  // Enabled predefined LoRAs (see a model's `loras`) with any custom slider
+  // strength; sent with the run.
+  enabledLoras: LoraSelection[];
   // The open image is tracked by its stable result id, not a list position, so a
   // background refetch that prepends/reorders rows can't swap the shown image.
   lightboxId: string | null;
@@ -79,7 +81,7 @@ export interface StudioState {
   removeLiveStep: (generationId: string) => void;
   setReferenceImage: (image: string | null, oversized?: boolean) => void;
   setPoseImage: (image: string | null) => void;
-  setEnabledLoraIds: (ids: string[]) => void;
+  setEnabledLoras: (loras: LoraSelection[]) => void;
   toggleModel: (id: string) => void;
   setRatio: (ratio: RatioKey) => void;
   setResolution: (resolution: ResolutionKey) => void;
@@ -115,7 +117,7 @@ export function createStudioStore(config: StudioClientConfig) {
         referenceImage: null,
         referenceImageOversized: false,
         poseImage: null,
-        enabledLoraIds: [],
+        enabledLoras: [],
         lightboxId: null,
         selectedIds: [],
         generating: false,
@@ -142,7 +144,7 @@ export function createStudioStore(config: StudioClientConfig) {
             referenceImageOversized: image !== null && oversized,
           }),
         setPoseImage: (image) => set({ poseImage: image }),
-        setEnabledLoraIds: (ids) => set({ enabledLoraIds: ids }),
+        setEnabledLoras: (loras) => set({ enabledLoras: loras }),
 
         toggleModel: (id) =>
           set((state) => ({
@@ -178,7 +180,7 @@ export function createStudioStore(config: StudioClientConfig) {
           poseImage: state.poseImage?.startsWith("data:")
             ? null
             : state.poseImage,
-          enabledLoraIds: state.enabledLoraIds,
+          enabledLoras: state.enabledLoras,
         }),
         merge: (persisted, current) => {
           const stored = persisted as Partial<PersistedOptions> | undefined;
@@ -198,10 +200,11 @@ export function createStudioStore(config: StudioClientConfig) {
               stored?.poseImage && presetPoseUrls.includes(stored.poseImage)
                 ? stored.poseImage
                 : null,
-            // Drop persisted lora ids that were removed since the last visit.
-            enabledLoraIds:
-              stored?.enabledLoraIds?.filter((id) => loraIds.includes(id)) ??
-              current.enabledLoraIds,
+            // Drop persisted loras whose ids were removed since the last visit.
+            enabledLoras:
+              stored?.enabledLoras?.filter((lora) =>
+                loraIds.includes(lora.id)
+              ) ?? current.enabledLoras,
           };
         },
         // SSR renders with defaults; <StudioOptionsHydration /> rehydrates from

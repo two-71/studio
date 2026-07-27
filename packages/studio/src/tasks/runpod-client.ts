@@ -41,8 +41,8 @@ export interface GenerateInput {
   poseImage?: string;
   /** Pure base64 reference image; enables the workflow's reference branch. */
   referenceImage?: string;
-  /** Enabled predefined LoRA ids; unmapped slots are switched off. */
-  loras?: string[];
+  /** Enabled LoRAs, already resolved to workflow file + final strength. */
+  loras?: { file: string; strength: number }[];
 }
 
 // Filenames the uploaded images are stored under in ComfyUI's input folder;
@@ -119,12 +119,24 @@ function buildWorkflow(workflow: WorkflowSpec, input: GenerateInput): unknown {
     const { node, input: field } = workflow.nodes.referenceImage;
     cloned[node].inputs[field] = REFERENCE_FILENAME;
   }
-  // Every mapped LoRA slot gets its `on` flag written both ways: the workflow
-  // JSON may ship with a slot enabled by default, so absence must switch it off.
-  const enabledLoras = new Set(input.loras ?? []);
-  for (const [loraId, target] of Object.entries(workflow.nodes.loras ?? {})) {
-    const slot = cloned[target.node].inputs[target.input] as { on: boolean };
-    slot.on = enabledLoras.has(loraId);
+  // Enabled LoRAs are appended as fresh `lora_N` slots after any the graph
+  // already declares (e.g. the identity-edit lora_1), so the shipped graph
+  // never needs a slot per configured LoRA.
+  const loraLoader = workflow.nodes.loraLoader;
+  if (loraLoader && input.loras?.length) {
+    const loaderInputs = cloned[loraLoader.node].inputs;
+    let slot = 1;
+    while (`lora_${slot}` in loaderInputs) {
+      slot += 1;
+    }
+    for (const lora of input.loras) {
+      loaderInputs[`lora_${slot}`] = {
+        on: true,
+        lora: lora.file,
+        strength: lora.strength,
+      };
+      slot += 1;
+    }
   }
   return cloned;
 }

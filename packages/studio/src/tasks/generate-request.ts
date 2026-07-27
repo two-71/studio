@@ -8,6 +8,7 @@
 import { logger, metadata, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 import { runEnhance } from "../ai/prompt-runners";
+import { decodeLoraSelection } from "../config/lora-selection";
 import { RATIO_KEYS, type StudioConfig } from "../config/types";
 import type { GenerateImagePayload, GenerateImageTask } from "./generate-image";
 import type { GenerateTitleTask } from "./generate-title";
@@ -101,9 +102,12 @@ export function createGenerateRequestTask(
             // "control" model) since the config carries no explicit notion of
             // which model a lora id belongs to — mirrors the flat LORAS
             // lookup this replaces.
+            const enabledIds = new Set(
+              payload.loras.map((value) => decodeLoraSelection(value).id)
+            );
             const triggerWords = config.models
               .flatMap((model) => model.loras ?? [])
-              .filter((lora) => payload.loras.includes(lora.id))
+              .filter((lora) => enabledIds.has(lora.id))
               .map((lora) => lora.triggerWords)
               .filter((words): words is string => Boolean(words));
             const out = await runEnhance(enhanceSpec, payload.prompt, {

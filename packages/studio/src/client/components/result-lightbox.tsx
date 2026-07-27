@@ -21,6 +21,7 @@ import { Dialog as DialogPrimitive } from "radix-ui";
 import { type CSSProperties, useRef, useState } from "react";
 import { ReactCompareSlider } from "react-compare-slider";
 import { toast } from "sonner";
+import { decodeLoraSelection } from "../../config/lora-selection";
 import type { LoraSpec, RatioKey } from "../../config/types";
 import { useDeleteGenerations } from "../hooks/use-delete-generations";
 import { useGenerations, useLiveResults } from "../hooks/use-generations";
@@ -411,8 +412,12 @@ function InfoActions({
   );
 }
 
-function loraName(id: string, loras: LoraSpec[]): string {
-  return loras.find((lora) => lora.id === id)?.name ?? id;
+// Persisted values are "id" or "id@strength"; the badge shows the name plus
+// the custom weight when one was set.
+function loraLabel(value: string, loras: LoraSpec[]): string {
+  const { id, strength } = decodeLoraSelection(value);
+  const name = loras.find((lora) => lora.id === id)?.name ?? id;
+  return strength === undefined ? name : `${name} (${strength})`;
 }
 
 /**
@@ -523,9 +528,9 @@ function InfoDetails({ result }: { result: StudioResult }) {
             Enhanced
           </Badge>
         )}
-        {result.loras?.map((id) => (
-          <Badge key={id} variant="secondary">
-            LoRA: {loraName(id, allLoras)}
+        {result.loras?.map((value) => (
+          <Badge key={value} variant="secondary">
+            LoRA: {loraLabel(value, allLoras)}
           </Badge>
         ))}
       </div>

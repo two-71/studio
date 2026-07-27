@@ -118,14 +118,14 @@ const krea2: StudioModel = {
     {
       id: "ultrareal",
       name: "UltraReal",
+      file: "lenovo_krea2.safetensors",
       triggerWords: "photo, amateur photography",
-      slotKey: "lora_2",
     },
     {
       id: "phone-photography",
       name: "Phone Photography",
+      file: "phone_photography_2025_krea2.safetensors",
       triggerWords: "phone photo",
-      slotKey: "lora_3",
     },
   ],
   workflow: {
@@ -139,12 +139,10 @@ const krea2: StudioModel = {
       referenceToggle: { node: "2", input: "value" },
       referenceImage: { node: "19", input: "image" },
       // Identity-edit lora rides in the same power-loader; enabled only
-      // when a reference image is attached.
+      // when a reference image is attached. Selected LoRAs are appended to
+      // the loader as extra slots at request build time.
       referenceLoraToggle: { node: "9", input: "lora_1" },
-      loras: {
-        ultrareal: { node: "9", input: "lora_2" },
-        "phone-photography": { node: "9", input: "lora_3" },
-      },
+      loraLoader: { node: "9" },
     },
   },
 };

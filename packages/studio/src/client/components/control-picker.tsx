@@ -17,7 +17,7 @@ export function ControlPicker() {
   const config = useStudioConfig();
   const poseImage = useStudioStore((state) => state.poseImage);
   const setPoseImage = useStudioStore((state) => state.setPoseImage);
-  const enabledLoraIds = useStudioStore((state) => state.enabledLoraIds);
+  const enabledLoras = useStudioStore((state) => state.enabledLoras);
   const selectedModelIds = useStudioStore((state) => state.selectedModelIds);
   const [modalOpen, setModalOpen] = useState(false);
   const [loraModalOpen, setLoraModalOpen] = useState(false);
@@ -76,9 +76,9 @@ export function ControlPicker() {
               LoRAs
             </span>
           </button>
-          {enabledLoraIds.length > 0 ? (
+          {enabledLoras.length > 0 ? (
             <span className="pointer-events-none absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-primary font-medium text-[10px] text-primary-foreground">
-              {enabledLoraIds.length}
+              {enabledLoras.length}
             </span>
           ) : null}
         </div>

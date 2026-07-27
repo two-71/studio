@@ -15,6 +15,11 @@
 
 import { tasks } from "@trigger.dev/sdk";
 import { z } from "zod";
+import {
+  defaultLoraStrength,
+  encodeLoraSelection,
+  resolveLoraStrength,
+} from "../config/lora-selection";
 import { RATIO_KEYS, type StudioConfig } from "../config/types";
 import {
   type CreateGenerationInput,
@@ -72,7 +77,9 @@ function buildGenerateRunSchema(config: StudioConfig) {
     resolutionTier: z.enum(RESOLUTION_TIERS).default("Standard"),
     poseImage: z.string().min(1).optional(),
     referenceImage: z.string().min(1).optional(),
-    loras: z.array(z.string()).default([]),
+    loras: z
+      .array(z.object({ id: z.string(), strength: z.number().optional() }))
+      .default([]),
     posePreset: z
       .string()
       .refine((path) => posePaths.has(path), { message: "unknown pose preset" })
@@ -139,6 +146,25 @@ async function handleGenerateRun(
     );
   }
 
+  // Selections resolve against the configured catalog here, once: unknown ids
+  // are dropped, slider strengths clamped, and the result encoded to the
+  // "id@strength" strings the DB column and task payloads carry (plain id
+  // when the strength is the LoRA's default).
+  const loraCatalog = config.models.flatMap((model) => model.loras ?? []);
+  const loras = input.loras.flatMap((selection) => {
+    const spec = loraCatalog.find((lora) => lora.id === selection.id);
+    if (!spec) {
+      return [];
+    }
+    const strength = resolveLoraStrength(spec, selection.strength);
+    return [
+      encodeLoraSelection({
+        id: spec.id,
+        strength: strength === defaultLoraStrength(spec) ? undefined : strength,
+      }),
+    ];
+  });
+
   // Resolve seeds before insert so the exact value sent to the workflow is the
   // one persisted — a run is always reproducible from its row. A pinned seed
   // applies to every model; otherwise each row gets its own.
@@ -156,7 +182,7 @@ async function handleGenerateRun(
     modelId,
     prompt: input.prompt,
     seed: pinnedSeed ?? Math.floor(Math.random() * MAX_SEED),
-    loras: input.loras,
+    loras,
     pose: input.posePreset,
     ratio: input.ratio,
     resolution: input.resolutionTier,
@@ -196,7 +222,7 @@ async function handleGenerateRun(
     prompt: input.prompt,
     enhance: input.enhance,
     ratio: input.ratio,
-    loras: input.loras,
+    loras,
     posePreset: input.posePreset,
     poseImageKey,
     referenceImageKey,
