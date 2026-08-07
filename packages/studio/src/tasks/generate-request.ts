@@ -9,7 +9,11 @@ import { logger, metadata, schemaTask } from "@trigger.dev/sdk";
 import { z } from "zod";
 import { runEnhance } from "../ai/prompt-runners";
 import { decodeLoraSelection } from "../config/lora-selection";
-import { RATIO_KEYS, type StudioConfig } from "../config/types";
+import {
+  RATIO_KEYS,
+  type StorageAdapter,
+  type StudioConfig,
+} from "../config/types";
 import type { GenerateImagePayload, GenerateImageTask } from "./generate-image";
 import type { GenerateTitleTask } from "./generate-title";
 import type { TaskGenerationQueries } from "./generation-queries";
@@ -44,6 +48,30 @@ export type GenerateRequestPayload = z.infer<
   typeof generateRequestPayloadSchema
 >;
 
+interface ControlImageKeys {
+  enhance: boolean;
+  poseImageKey?: string;
+  referenceImageKey?: string;
+}
+
+// Reference images always feed moderation. Pose images only feed prompt
+// enhancement, so avoid downloading them when enhancement is disabled.
+export async function downloadControlImages(
+  storage: Pick<StorageAdapter, "getBase64">,
+  input: ControlImageKeys
+): Promise<
+  [poseImage: string | undefined, referenceImage: string | undefined]
+> {
+  return await Promise.all([
+    input.enhance && input.poseImageKey
+      ? storage.getBase64(input.poseImageKey)
+      : undefined,
+    input.referenceImageKey
+      ? storage.getBase64(input.referenceImageKey)
+      : undefined,
+  ]);
+}
+
 export function createGenerateRequestTask(
   config: StudioConfig,
   queries: TaskGenerationQueries,
@@ -66,20 +94,14 @@ export function createGenerateRequestTask(
     });
     logger.info("generate-title triggered", { runId: titleHandle.id });
 
-    // The control images are only consumed by the enhancer below (the children
-    // download their own copies), so skip the multi-MB fetches when enhancement
-    // is off.
+    // Reference images feed moderation even when enhancement is off. Pose
+    // images only feed enhancement. Children download their own copies later.
     metadata.set("step", "downloading-inputs");
-    const [poseImage, referenceImage] = payload.enhance
+    const shouldDownloadInputs =
+      payload.enhance || Boolean(payload.referenceImageKey);
+    const [poseImage, referenceImage] = shouldDownloadInputs
       ? await logger.trace("download-control-inputs", async (span) => {
-          const images = await Promise.all([
-            payload.poseImageKey
-              ? config.storage.getBase64(payload.poseImageKey)
-              : undefined,
-            payload.referenceImageKey
-              ? config.storage.getBase64(payload.referenceImageKey)
-              : undefined,
-          ]);
+          const images = await downloadControlImages(config.storage, payload);
           span.setAttribute("pose.bytes", images[0]?.length ?? 0);
           span.setAttribute("reference.bytes", images[1]?.length ?? 0);
           return images;
@@ -125,6 +147,7 @@ export function createGenerateRequestTask(
       const result = await config.moderation.check({
         prompt: payload.prompt,
         userId: payload.userId,
+        referenceImage,
       });
       span.setAttribute("output.action", result.action);
       if (result.action === "allow" && result.rewritten) {
@@ -146,7 +169,7 @@ export function createGenerateRequestTask(
         moderatePromise,
       ]);
     } catch (err) {
-      logger.error("prompt moderation failed", { err, prompt: payload.prompt });
+      logger.error("moderation failed", { err, prompt: payload.prompt });
       metadata
         .set("step", "failed")
         .set("failReason", "moderation_unavailable");
@@ -159,7 +182,7 @@ export function createGenerateRequestTask(
     }
 
     if (moderated.action === "block") {
-      logger.warn("prompt blocked by moderation", { prompt: payload.prompt });
+      logger.warn("request blocked by moderation", { prompt: payload.prompt });
       metadata.set("step", "failed").set("failReason", "content_policy");
       // Block audit is the moderation provider's responsibility,
       // so this task doesn't record it directly.

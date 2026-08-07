@@ -114,13 +114,17 @@ type ModerationResult =
   | { action: "block"; reason?: string };
 
 interface ModerationProvider {
-  check(input: { prompt: string; userId: string }): Promise<ModerationResult>;
+  check(input: {
+    prompt: string;
+    userId: string;
+    referenceImage?: string;
+  }): Promise<ModerationResult>;
 }
 ```
 
 Contract notes, from how `generate-request.ts` (the orchestrator task) actually calls it:
 
-- **Called once per generate request**, concurrently with the enhance step, over the user's original typed prompt — not the enhanced one. Moderation gates the user's intent; the enhancer runs over an already-moderated prompt (see [PromptSpec](#promptspec) below).
+- **Called once per generate request**, concurrently with the enhance step, over the user's original typed prompt — not the enhanced one. When supplied, `referenceImage` is the user's pure base64 reference image; providers can inspect it alongside the prompt or ignore it. Moderation gates the user's inputs; the enhancer runs over an already-moderated prompt (see [PromptSpec](#promptspec) below).
 - **Fail-closed.** `check` rejecting or throwing is treated exactly like any other task error: the orchestrator catches it, marks every row in the batch `failed` with reason `moderation_unavailable`, and stops — it does **not** fall back to allowing the prompt through. If your moderation call can fail (network error, upstream 5xx), let that surface as a thrown error rather than swallowing it into an `"allow"`.
 - **`{ action: "block" }` short-circuits generation** — rows are marked failed with reason `content_policy` and no RunPod job is ever submitted or charged.
 - **`{ action: "allow", rewritten }` swaps the prompt.** If you rewrite instead of blocking, the rewritten text is what actually gets sent to RunPod (and is what the enhancer's output is discarded in favor of — see the note above); the original is preserved separately as `originalPrompt` on the row.

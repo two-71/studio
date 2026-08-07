@@ -136,7 +136,13 @@ export type ModerationResult =
   | { action: "block"; reason?: string };
 
 export interface ModerationProvider {
-  check(input: { prompt: string; userId: string }): Promise<ModerationResult>;
+  check(input: {
+    prompt: string;
+    userId: string;
+    // Pure base64 reference image, when supplied by the user. Providers can
+    // inspect it alongside the prompt or ignore it.
+    referenceImage?: string;
+  }): Promise<ModerationResult>;
 }
 
 // --- Prompts -----------------------------------------------------------------
